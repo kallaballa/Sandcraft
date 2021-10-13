@@ -1,0 +1,1 @@
+#undef FONTCONFIG_CFLAGS

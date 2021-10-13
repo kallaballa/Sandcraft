@@ -1,0 +1,216 @@
+.\" Copyright (c) 2007-2020 Julien Nadeau Carriere <vedge@csoft.net>
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 
+.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+.\" INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+.\" (INCLUDING BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+.\" SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+.\" STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+.\" IN ANY WAY OUT OF THE USE OF THIS SOFTWARE EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.\"
+.Dd June 17, 2007
+.Dt AG_CONFIG 3
+.Os
+.ds vT Agar API Reference
+.ds oS Agar 1.0
+.Sh NAME
+.Nm AG_Config
+.Nd agar configuration interface
+.Sh SYNOPSIS
+.Bd -literal
+#include <agar/core.h>
+.Ed
+.Sh DESCRIPTION
+The
+.Nm
+object records configuration settings global to an Agar application.
+This includes user preferences which are to be preserved after the
+application has exited.
+.Pp
+Library or application-specific data may also be stored in the configuration
+object as
+.Xr AG_Variable 3
+values.
+Variable names should not start with "ag_", the prefix is reserved for
+internal Agar settings.
+.Pp
+Note that our
+.Xr AG_Variable 3
+system implements pointers (or "bindings"), so it is always possible for
+a parameter value to be specified as a pointer to an external piece of data.
+.Sh INHERITANCE HIERARCHY
+.Xr AG_Object 3 ->
+.Nm .
+.Sh INTERFACE
+.nr nS 1
+.Ft "AG_Config *"
+.Fn AG_ConfigObject "void"
+.Pp
+.Ft "int"
+.Fn AG_ConfigLoad "void"
+.Pp
+.Ft "int"
+.Fn AG_ConfigSave "void"
+.Pp
+.Ft "int"
+.Fn AG_ConfigFind "AG_ConfigPathGroup group" "const char *filename" "char *dst" "AG_Size dst_size"
+.Pp
+.Ft "void"
+.Fn AG_ConfigAddPath "AG_ConfigPathGroup group" "const char *format" "..."
+.Pp
+.Ft "void"
+.Fn AG_ConfigAddPathS "AG_ConfigPathGroup group" "const char *pathname"
+.Pp
+.Ft "void"
+.Fn AG_ConfigSetPath "AG_ConfigPathGroup group" "int index" "const char *format" "..."
+.Pp
+.Ft "void"
+.Fn AG_ConfigSetPathS "AG_ConfigPathGroup group" "int index" "const char *pathname"
+.Pp
+.Ft "void"
+.Fn AG_ConfigDelPath "AG_ConfigPathGroup group" "const char *format" "..."
+.Pp
+.Ft "void"
+.Fn AG_ConfigDelPathS "AG_ConfigPathGroup group" "const char *pathname"
+.Pp
+.nr nS 0
+.Fn AG_ConfigObject
+returns a pointer to the global
+.Va agConfig
+object.
+.Pp
+.Fn AG_ConfigLoad
+loads the configuration data from disk, returning 0 on sucess
+or -1 on failure.
+It is equivalent to calling
+.Xr AG_ObjectLoad 3
+on the
+.Va agConfig
+object.
+Note that
+.Fn AG_ConfigLoad
+must be called after the initialization of all Agar libraries
+(i.e., if an application uses Agar-GUI, then the
+.Fn AG_ConfigLoad
+call must follow
+.Fn AG_InitGraphics ) .
+.Pp
+The
+.Fn AG_ConfigSave
+function saves the configuration data to disk, returning 0 on success
+or -1 on failure.
+It is equivalent to calling
+.Xr AG_ObjectSave 3
+on the
+.Va agConfig
+object.
+.Pp
+The
+.Fn AG_ConfigFind
+function searches a list of registered paths for the given file.
+.Fa group
+may be
+.Dv AG_CONFIG_PATH_DATA
+(for object and data files), or
+.Dv AG_CONFIG_PATH_FONTS
+(for fonts).
+If
+.Fa filename
+is found and and the file is accessible, then its absolute pathname is
+copied into the fixed-size buffer
+.Fa dst_path
+(limited to
+.Fa dst_len
+bytes), and
+.Fn AG_ConfigFind
+returns 0.
+If the file cannot be found, it returns -1.
+.Pp
+.Fn AG_ConfigAddPath
+adds the specified directory to the list of
+.Fn AG_ConfigFind
+search paths.
+.Pp
+.Fn AG_ConfigSetPath
+sets the path at index
+.Fa idx .
+If there is no such entry but
+.Fa idx
+is (last)-1, then the entry is created.
+Otherwise
+.Fn AG_ConfigFind
+will fail and return -1.
+.Pp
+.Fn AG_ConfigDelPath
+removes the given directory from the list of registered search paths.
+.Sh EXAMPLES
+The following code sets an integer option and a string.
+The configuration is then immediately saved to disk:
+.Bd -literal -offset indent
+AG_SetInt(agConfig, "my-setting", 1);
+AG_SetString(agConfig, "my-string", "Foo bar");
+AG_ConfigSave();
+.Ed
+.Pp
+The following Agar-GUI code displays a checkbox controlling the value
+of "my-setting":
+.Bd -literal -offset indent
+AG_Checkbox *cb;
+
+cb = AG_CheckboxNew(win, 0, "My setting");
+AG_BindVariable(cb, "state", agConfig, "my-setting");
+.Ed
+.Pp
+The following code binds "my-ext-setting" to an external variable, and then
+reads the configuration from disk.
+If the saved configuration has "my-ext-setting" defined, then the variable will
+be set accordingly:
+.Bd -literal -offset indent
+int myExtSetting = 0;
+
+AG_BindInt(agConfig, "my-ext-setting", &myExtSetting);
+AG_ConfigLoad();
+.Ed
+.Pp
+The following code dumps the currently configured paths:
+.Bd -literal -offset indent
+char path[AG_PATHNAME_MAX];
+int i,j;
+
+for (i=0; i<AG_CONFIG_PATH_LAST; i++) {
+	for (j=0; ; j++) {
+		if (AG_ConfigGetPath(i,j, path, sizeof(path)) == 0) {
+			break;
+		}
+		AG_LabelNew(win, 0, "%s[%d] = %s",
+		    agConfigPathGroupNames[i], j, path);
+	}
+}
+.Ed
+.Sh SEE ALSO
+.Xr AG_Intro 3 ,
+.Xr AG_Object 3
+.Sh HISTORY
+The
+.Nm
+interface first appeared in Agar 1.0.
+.Fn AG_ConfigFind ,
+.Fn AG_ConfigAddPath ,
+.Fn AG_ConfigSetPath
+and
+.Fn AG_ConfigDelPath
+were introduced in Agar 1.6.0.

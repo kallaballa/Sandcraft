@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Sandcraft</title>
+  <meta name="author" content="amir@viel-zu.org">
+  <meta name="viewport" content="width=768">
+<style>
+  #help {
+    position: fixed;
+    top: calc(100% - 4vh);
+    left: 1em;
+    margin: auto;
+    color: rgba(0,0,0,0.8);
+    width: 5em;
+    max-height: 1.8em;
+/*     background: none!important; */
+/*     background-color: black; */
+    font-size: 1em;
+    padding: 0.1em;
+  }
+
+#palette {
+    position: fixed;
+    top: calc(100% - 4vh);
+    left: 7em;
+    margin: auto;
+    color: rgba(255,255,255,0.8);
+    width: 13em;
+    max-height: 1.8em;
+/*     background: none!important; */
+/*     background-color: black; */
+    font-size: 1em;
+    padding: 0.1em;
+  }
+
+#upload {
+    position: fixed;
+    top: calc(100% - 4vh);
+    left: 20em;
+    margin: auto;
+    color: rgba(255,255,255,0.8);
+/*     width: 5em; */
+    max-height: 1.8em;
+/*     background: none!important; */
+/*     background-color: black; */
+    font-size: 1em;
+    padding: 0.1em;
+  }
+
+body {
+    position: relative;
+    width: 98vw;
+}
+#content {
+    position: relative;
+    padding-bottom: calc(100% * 9 / 16);
+}
+#canvas {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+</style>
+<script>
+	function resize_canvas() {
+	        var canvas = document.getElementById('canvas');
+        	var container = document.getElementById ("content");
+		canvas.style.width = container.clientWidth + "px";
+                canvas.style.height = container.clientHeight + "px";
+	}
+
+</script>
+</head>
+<body style="background-color: #000000;">
+	<button id="help">Help</button>
+<div id="content">
+        <canvas id="canvas"></canvas>
+        <button id="help">Help</button>
+        <div id="palette"><input type="checkbox" id="chk"/><label for="chk">Copy Palette from image</label></div>
+        <div id="upload"><label for="file">Load Image: </label><input type="file" id="imageload" onchange="load_file()" accept="image/png, image/jpeg"/></div>
+
+        <script>
+        var canvas = document.getElementById('canvas');
+        var container = document.getElementById ("content");
+            var Module = {
+				print: (function() {
+					return function(message) {
+                        console.log(message);
+					};
+				})(),
+				printErr: function(message) {
+				if(message === "loaded") {
+					canvas.style.width = container.clientWidth + "px";
+		                	canvas.style.height = container.clientHeight + "px";
+				}
+
+                    console.error(message);
+                },				
+				canvas: (function() {
+					return document.getElementById('canvas');
+				})()
+			};
+	    window.addEventListener ("resize", function (e) {
+                canvas.style.width = container.clientWidth + "px";
+                canvas.style.height = container.clientHeight + "px";
+            }, true);
+
+            let reader= new FileReader();
+
+            function load_file(){
+                let files = document.getElementById('imageload').files;
+                let file=files[0];
+                reader.addEventListener('loadend', load_image);
+                reader.readAsArrayBuffer(file);
+            }
+
+            function load_image(e){
+                let checked = document.getElementById('chk').checked;
+                let result=reader.result;
+                const uint8_view = new Uint8Array(result);
+
+                FS.writeFile('temp.png', uint8_view)
+                Module.ccall('load_image', 'number', ['string', 'bool'], ['temp.png', checked])
+            }
+		</script>
+		<script src="sandcraft.js"></script>
+</div>
+</body>
+</html>

@@ -1,0 +1,3 @@
+#ifndef HAVE_PTHREAD_T_POINTER
+#define HAVE_PTHREAD_T_POINTER "yes"
+#endif

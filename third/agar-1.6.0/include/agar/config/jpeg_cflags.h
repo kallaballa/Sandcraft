@@ -1,0 +1,1 @@
+#undef JPEG_CFLAGS

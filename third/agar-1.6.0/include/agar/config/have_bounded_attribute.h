@@ -1,0 +1,3 @@
+#ifndef HAVE_BOUNDED_ATTRIBUTE
+#define HAVE_BOUNDED_ATTRIBUTE "yes"
+#endif

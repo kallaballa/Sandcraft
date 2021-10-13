@@ -1,0 +1,3 @@
+#ifndef HAVE_ALIGNED_ATTRIBUTE
+#define HAVE_ALIGNED_ATTRIBUTE "yes"
+#endif

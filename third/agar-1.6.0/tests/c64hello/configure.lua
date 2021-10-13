@@ -1,0 +1,11 @@
+hdefs["ENABLE_NLS"] = nil
+hdefs["PREFIX"] = "/usr/local"
+hdefs["BINDIR"] = "/usr/local/bin"
+hdefs["LIBDIR"] = "/usr/local/lib"
+hdefs["MODULEDIR"] = "/usr/local/lib"
+hdefs["LIBEXECDIR"] = "/usr/local/libexec"
+hdefs["DATADIR"] = "/usr/local/share"
+hdefs["STATEDIR"] = "/usr/local/var"
+hdefs["SYSCONFDIR"] = "/usr/local/etc"
+hdefs["LOCALEDIR"] = "/usr/local/share/locale"
+hdefs["MANDIR"] = "/usr/local/man"

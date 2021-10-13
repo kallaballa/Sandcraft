@@ -1,0 +1,209 @@
+# BSDBuild 3.2 <https://bsdbuild.hypertriton.com/>
+# ex:syn=sh
+env ./configure
+# checking for a C compiler...yes, /usr/bin/clang
+# checking whether the C compiler works...yes
+# cc: checking whether compiler is Clang...
+# C: HAVE_CC_CLANG
+cat << EOT >conftest5002.c
+#if !defined(__clang__)
+# error "is not clang"
+#endif
+int main(int argc, char *argv[]) { return (0); }
+EOT
+/usr/bin/clang    -o ./conftest5002 conftest5002.c  2>>config.log
+# yes
+# cc: checking whether compiler is GCC...
+# C: HAVE_CC_GCC
+cat << EOT >conftest5002.c
+#if !defined(__GNUC__) || defined(__clang__)
+# error "is not gcc"
+#endif
+int main(int argc, char *argv[]) { return (0); }
+EOT
+/usr/bin/clang    -o ./conftest5002 conftest5002.c  2>>config.log
+conftest5002.c:2:3: error: "is not gcc"
+# error "is not gcc"
+  ^
+1 error generated.
+# failed 0
+# no
+# cc: checking for compiler warning options...
+# C: HAVE_CC_WARNINGS
+cat << EOT >conftest5002.c
+int main(int argc, char *argv[]) { return (0); }
+EOT
+/usr/bin/clang   -Wall -o ./conftest5002 conftest5002.c  2>>config.log
+# yes
+# cc: checking for float and double...
+# C: HAVE_FLOAT
+cat << EOT >conftest5002.c
+#include <stdio.h>
+int
+main(int argc, char *argv[])
+{
+	float f = 0.1f;
+	double d = 0.2;
+
+	printf("%f", f);
+	return ((double)f + d) > 0.2 ? 1 : 0;
+}
+EOT
+/usr/bin/clang  -Wall -o ./conftest5002 conftest5002.c 2>>config.log
+# yes
+# cc: checking for long double...
+# C: HAVE_LONG_DOUBLE
+cat << EOT >conftest5002.c
+#include <stdio.h>
+int
+main(int argc, char *argv[])
+{
+	long double ld = 0.1;
+
+	printf("%Lf", ld);
+	return (ld + 0.1) > 0.2 ? 1 : 0;
+}
+EOT
+/usr/bin/clang  -Wall -o ./conftest5002 conftest5002.c 2>>config.log
+# yes
+# cc: checking for long long...
+# C: HAVE_LONG_LONG
+cat << EOT >conftest5002.c
+int
+main(int argc, char *argv[])
+{
+	long long ll = -1;
+	unsigned long long ull = 1;
+
+	return (ll != -1 || ull != 1);
+}
+EOT
+/usr/bin/clang  -Wall -o ./conftest5002 conftest5002.c 2>>config.log
+# yes
+# cc: checking for cygwin environment...
+# C: HAVE_CYGWIN
+cat << EOT >conftest5002.c
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <windows.h>
+
+int
+main(int argc, char *argv[]) {
+	struct stat sb;
+	DWORD rv;
+	rv = GetFileAttributes("foo");
+	stat("foo", &sb);
+	return (0);
+}
+EOT
+/usr/bin/clang  -Wall -mcygwin -o ./conftest5002 conftest5002.c 2>>config.log
+clang-12.0: error: unknown argument: '-mcygwin'
+# failed 0
+# no
+# cc: checking for -mwindows option...
+# C: HAVE_CC_MWINDOWS
+cat << EOT >conftest5002.c
+#include <windows.h>
+int
+main(int argc, char *argv[]) {
+	return GetFileAttributes("foo") ? 0 : 1;
+}
+EOT
+/usr/bin/clang  -Wall -mwindows -o ./conftest5002 conftest5002.c 2>>config.log
+clang-12.0: warning: argument unused during compilation: '-mwindows' [-Wunused-command-line-argument]
+conftest5002.c:1:10: fatal error: 'windows.h' file not found
+#include <windows.h>
+         ^~~~~~~~~~~
+1 error generated.
+# failed 0
+# no
+# cc: checking for -mconsole option...
+# C: HAVE_CC_MCONSOLE
+cat << EOT >conftest5002.c
+#include <windows.h>
+int
+main(int argc, char *argv[]) {
+	return GetFileAttributes("foo") ? 0 : 1;
+}
+EOT
+/usr/bin/clang  -Wall -mconsole -o ./conftest5002 conftest5002.c 2>>config.log
+clang-12.0: warning: argument unused during compilation: '-mconsole' [-Wunused-command-line-argument]
+conftest5002.c:1:10: fatal error: 'windows.h' file not found
+#include <windows.h>
+         ^~~~~~~~~~~
+1 error generated.
+# failed 0
+# no
+# checking for Agar...# yes (1.6.0)
+# checking whether Agar works...
+# C: HAVE_AGAR
+cat << EOT >conftest5002.c
+#include <agar/core.h>
+#include <agar/gui.h>
+
+int
+main(int argc, char *argv[])
+{
+	AG_InitCore("conf-test", 0);
+	AG_InitGraphics(AG_NULL);
+#ifdef AG_EVENT_LOOP
+	AG_EventLoop();
+#endif
+	AG_Quit();
+	return (0);
+}
+EOT
+/usr/bin/clang  -Wall -I/usr/local/include/agar                    -o ./conftest5002 conftest5002.c -L/usr/local/lib -lag_gui -lag_core  -lfreetype       -lm   -lpthread         2>>config.log
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_FreeSurface'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcPatternDestroy'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcObjectSetDestroy'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_VideoModeOK'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_WM_SetCaption'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_MapRGBA'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_ShowCursor'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcFontMatch'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_GetTicks'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcFini'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_UnlockSurface'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_PollEvent'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_InitSubSystem'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_LockSurface'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_FillRect'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_SetVideoMode'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_SetCursor'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_MapRGB'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_CreateCursor'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_GetVideoInfo'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_SetClipRect'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_UpperBlit'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_Init'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_GetRGBA'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcPatternGetString'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_GetCursor'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_UpdateRects'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_WM_ToggleFullScreen'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcFontSetDestroy'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_CreateRGBSurface'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcPatternGetInteger'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_FreeCursor'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcFontList'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcObjectSetBuild'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_UpdateRect'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_Delay'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_QuitSubSystem'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_WasInit'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcConfigSubstitute'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcDefaultSubstitute'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_GetError'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcPatternCreate'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcPatternGetMatrix'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcInit'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `FcNameParse'
+/usr/bin/ld: /usr/local/lib/libag_gui.so: undefined reference to `SDL_EnableUNICODE'
+clang-12.0: error: linker command failed with exit code 1 (use -v to see invocation)
+# failed 0
+# no
+# * 
+# * agartest requires Agar (version 1.6.0 or newer).
+# * WWW: http://libagar.org
+# * 

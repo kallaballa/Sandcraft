@@ -1,0 +1,1 @@
+#undef GETTEXT_LIBS

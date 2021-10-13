@@ -1,0 +1,1 @@
+#undef AG_TYPE_SAFETY

@@ -1,0 +1,1 @@
+#undef MYSQL_CFLAGS

@@ -1,0 +1,1 @@
+#undef HAVE_SYS_PARAM_H

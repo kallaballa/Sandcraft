@@ -1,0 +1,195 @@
+.\" Copyright (c) 2001-2020 Julien Nadeau Carriere <vedge@csoft.net>
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 
+.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+.\" INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+.\" (INCLUDING BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+.\" SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+.\" STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+.\" IN ANY WAY OUT OF THE USE OF THIS SOFTWARE EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.\"
+.Dd NOVEMBER 26, 2001
+.Dt AG_CORE 3
+.Os
+.ds vT Agar API Reference
+.ds oS Agar 1.6
+.Sh NAME
+.Nm AG_Core
+.Nd agar core library initialization
+.Sh SYNOPSIS
+.Bd -literal
+#include <agar/core.h>
+.Ed
+.Sh DESCRIPTION
+The Agar-Core library implements the
+.Xr AG_Object 3
+system and provides interfaces to common operating system services
+(filesystems, network APIs, threads, etc).
+Agar-GUI is built on top of
+.Nm ,
+but Agar-Core itself contains no GUI-related code and may be installed
+independently.
+.Pp
+.\" XXX list subsystems here as well
+For a complete listing of available subsystems and interfaces, see the
+.Dq AGAR-CORE
+section of
+.Xr AG_Intro 3 .
+.Sh INITIALIZATION
+.nr nS 1
+.Ft "int"
+.Fn AG_InitCore "const char *progname" "Uint flags"
+.Pp
+.Ft "void"
+.Fn AG_AtExitFunc "void (*fn)(void)"
+.Pp
+.Ft "void"
+.Fn AG_Quit "void"
+.Pp
+.Ft "void"
+.Fn AG_Destroy "void"
+.Pp
+.nr nS 0
+The
+.Fn AG_InitCore
+function initializes the
+.Nm
+library.
+.Fa progname
+is an optional identifier for the program.
+This name may be used to construct platform-specific directory paths.
+Unless the
+.Dv AG_CREATE_DATADIR
+.Fa flags
+option is set, the
+.Fa progname
+argument can be NULL.
+.Pp
+Available
+.Fa flags
+options include:
+.Bl -tag -width "AG_CREATE_DATADIR "
+.It AG_VERBOSE
+Allow errors/warnings on the standard error output.
+.It AG_CREATE_DATADIR
+Check that the application data directory exists, create it if necessary
+(or fail if it cannot be created).
+It contains the state of objects saved by
+.Xr AG_ObjectSave 3 .
+The default is
+.Fa $HOME/.progname/
+on Unix and platform-dependent elsewhere.
+.It AG_SOFT_TIMERS
+Don't use OS-provided timer mechanisms (such as BSD
+.Xr kqueue 2 ,
+Linux timerfd or
+.Xr select 2 ) .
+Timers will be handled either by explicitely updating a software-based timing
+wheel (see
+.Xr AG_ProcessTimeouts 3 ) ,
+or some other mechanism.
+.It AG_POSIX_USERS
+If both
+.Xr AG_User 3
+modules "getenv" and "posix" are available, prefer "posix".
+This is not the default because "posix" incurs potential startup overhead
+while initially accessing the password database (and $HOME is all Agar
+needs for its own purposes).
+.El
+.Pp
+The
+.Fn AG_AtExitFunc
+registers a function that will be invoked automatically by
+.Fn AG_Destroy .
+.Pp
+.Fn AG_Quit
+terminates the application by releasing resources allocated by
+.Nm
+and invoking
+.Xr exit 2 .
+.Pp
+The
+.Fn AG_Destroy
+function releases all resources allocated by the
+.Nm
+library.
+.\" MANLINK(AG_AgarVersion)
+.Sh AGAR VERSION INFORMATION
+.nr nS 1
+.Ft void
+.Fn AG_GetVersion "AG_AgarVersion *ver"
+.Pp
+.Ft bool
+.Fn AG_VERSION_ATLEAST "int major" "int minor" "int patchlevel"
+.Pp
+.nr nS 0
+The
+.Fn AG_GetVersion
+function fills an
+.Ft AG_AgarVersion
+structure with version information:
+.Bd -literal
+typedef struct ag_agar_version {
+	int major;
+	int minor;
+	int patch;
+	const char *release;
+} AG_AgarVersion;
+.Ed
+.Pp
+Agar does not need to have been previously initialized for
+.Fn AG_GetVersion
+to work.
+.Pp
+The
+.Fn AG_VERSION_ATLEAST
+macro evaluates to true if the current Agar version is equal to, or exceeds
+the given version number.
+.\" SYNC WITH AG_Intro(3) "AGAR-CORE"
+.Sh SEE ALSO
+.Xr AG_Config 3 ,
+.Xr AG_DataSource 3 ,
+.Xr AG_Db 3 ,
+.Xr AG_DSO 3 ,
+.Xr AG_Error 3 ,
+.Xr AG_Event 3 ,
+.Xr AG_EventLoop 3 ,
+.Xr AG_Execute 3 ,
+.Xr AG_File 3 ,
+.Xr AG_Intro 3 ,
+.Xr AG_Limits 3 ,
+.Xr AG_Net 3 ,
+.Xr AG_Object 3 ,
+.Xr AG_String 3 ,
+.Xr AG_TextElement 3 ,
+.Xr AG_Threads 3 ,
+.Xr AG_Time 3 ,
+.Xr AG_Timer 3 ,
+.Xr AG_User 3 ,
+.Xr AG_Variable 3 ,
+.Xr AG_Version 3
+.Sh HISTORY
+The
+.Fn AG_InitCore
+function first appeared in Agar 1.0.
+The
+.Dv AG_CREATE_DATADIR
+option appeared in Agar 1.3.3.
+.Dv AG_SOFT_TIMERS
+in Agar 1.5.0 and
+.Dv AG_POSIX_USERS
+in Agar 1.6.0.

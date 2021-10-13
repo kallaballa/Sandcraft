@@ -1,0 +1,1 @@
+#undef _MK_LITTLE_ENDIAN

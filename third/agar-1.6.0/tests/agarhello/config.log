@@ -1,0 +1,132 @@
+# BSDBuild 3.2 <http://bsdbuild.hypertriton.com/>
+# ex:syn=sh
+env ./configure --without-jpeg
+# checking for a C compiler...yes, /usr/bin/clang
+# checking whether the C compiler works...yes
+# cc: checking for compiler warning options...
+# C: HAVE_CC_WARNINGS
+cat << EOT >conftest17690.c
+int main(int argc, char *argv[]) { return (0); }
+EOT
+/usr/bin/clang   -Wall -o ./conftest17690 conftest17690.c  2>>config.log
+# yes
+# cc: checking for float and double...
+# C: HAVE_FLOAT
+cat << EOT >conftest17690.c
+#include <stdio.h>
+int
+main(int argc, char *argv[])
+{
+	float f = 0.1f;
+	double d = 0.2;
+
+	printf("%f", f);
+	return ((double)f + d) > 0.2 ? 1 : 0;
+}
+EOT
+/usr/bin/clang  -Wall -o ./conftest17690 conftest17690.c 2>>config.log
+# yes
+# cc: checking for long double...
+# C: HAVE_LONG_DOUBLE
+cat << EOT >conftest17690.c
+#include <stdio.h>
+int
+main(int argc, char *argv[])
+{
+	long double ld = 0.1;
+
+	printf("%Lf", ld);
+	return (ld + 0.1) > 0.2 ? 1 : 0;
+}
+EOT
+/usr/bin/clang  -Wall -o ./conftest17690 conftest17690.c 2>>config.log
+# yes
+# cc: checking for long long...
+# C: HAVE_LONG_LONG
+cat << EOT >conftest17690.c
+int
+main(int argc, char *argv[])
+{
+	long long ll = -1;
+	unsigned long long ull = 1;
+
+	return (ll != -1 || ull != 1);
+}
+EOT
+/usr/bin/clang  -Wall -o ./conftest17690 conftest17690.c 2>>config.log
+# yes
+# cc: checking for cygwin environment...
+# C: HAVE_CYGWIN
+cat << EOT >conftest17690.c
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <windows.h>
+
+int
+main(int argc, char *argv[]) {
+	struct stat sb;
+	DWORD rv;
+	rv = GetFileAttributes("foo");
+	stat("foo", &sb);
+	return (0);
+}
+EOT
+/usr/bin/clang  -Wall -mcygwin -o ./conftest17690 conftest17690.c 2>>config.log
+clang-12.0: error: unknown argument: '-mcygwin'
+# failed 0
+# no
+# cc: checking for -mwindows option...
+# C: HAVE_CC_MWINDOWS
+cat << EOT >conftest17690.c
+#include <windows.h>
+int
+main(int argc, char *argv[]) {
+	return GetFileAttributes("foo") ? 0 : 1;
+}
+EOT
+/usr/bin/clang  -Wall -mwindows -o ./conftest17690 conftest17690.c 2>>config.log
+clang-12.0: warning: argument unused during compilation: '-mwindows' [-Wunused-command-line-argument]
+conftest17690.c:1:10: fatal error: 'windows.h' file not found
+#include <windows.h>
+         ^~~~~~~~~~~
+1 error generated.
+# failed 0
+# no
+# cc: checking for -mconsole option...
+# C: HAVE_CC_MCONSOLE
+cat << EOT >conftest17690.c
+#include <windows.h>
+int
+main(int argc, char *argv[]) {
+	return GetFileAttributes("foo") ? 0 : 1;
+}
+EOT
+/usr/bin/clang  -Wall -mconsole -o ./conftest17690 conftest17690.c 2>>config.log
+clang-12.0: warning: argument unused during compilation: '-mconsole' [-Wunused-command-line-argument]
+conftest17690.c:1:10: fatal error: 'windows.h' file not found
+#include <windows.h>
+         ^~~~~~~~~~~
+1 error generated.
+# failed 0
+# no
+# checking for Agar...# yes (1.6.0)
+# checking whether Agar works...
+# C: HAVE_AGAR
+cat << EOT >conftest17690.c
+#include <agar/core.h>
+#include <agar/gui.h>
+
+int
+main(int argc, char *argv[])
+{
+	AG_InitCore("conf-test", 0);
+	AG_InitGraphics(AG_NULL);
+#ifdef AG_EVENT_LOOP
+	AG_EventLoop();
+#endif
+	AG_Quit();
+	return (0);
+}
+EOT
+/usr/bin/clang  -Wall -I/usr/local/include/agar -I/usr/local/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -I/usr/include/freetype2  -I/usr/include/freetype2 -I/usr/include/uuid        -I/usr/include/libpng16          -o ./conftest17690 conftest17690.c -L/usr/local/lib -lag_gui -lag_core  -L/usr/local/lib64 -lSDL -lpthread -lfreetype  -lfontconfig -lfreetype      -lm  -L/usr/lib64 -lpng16 -lpthread         2>>config.log
+# yes

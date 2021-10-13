@@ -1,0 +1,3 @@
+#ifndef HAVE_MALLOC_ATTRIBUTE
+#define HAVE_MALLOC_ATTRIBUTE "yes"
+#endif

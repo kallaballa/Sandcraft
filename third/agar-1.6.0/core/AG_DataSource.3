@@ -1,0 +1,652 @@
+.\" Copyright (c) 2007-2020 Julien Nadeau Carriere <vedge@csoft.net>
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+.\" INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+.\" (INCLUDING BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+.\" SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+.\" STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+.\" IN ANY WAY OUT OF THE USE OF THIS SOFTWARE EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.\"
+.Dd November 16, 2007
+.Dt AG_DATASOURCE 3
+.Os
+.ds vT Agar API Reference
+.ds oS Agar 1.3
+.Sh NAME
+.Nm AG_DataSource
+.Nd agar data source access
+.Sh SYNOPSIS
+.Bd -literal
+#include <agar/core.h>
+.Ed
+.Sh DESCRIPTION
+.Nm
+provides a generic interface to different types of data sources such as
+.Ft AG_FileSource
+for files,
+.Ft AG_CoreSource
+for fixed-size memory,
+.Ft AG_AutoCoreSource
+for autoallocated memory,
+.Ft AG_ConstCoreSource
+for read-only memory and
+.Ft AG_NetSocketSource
+for
+.Xr AG_Net 3
+sockets.
+.Sh INTERFACE
+.nr nS 1
+.Ft "AG_DataSource *"
+.Fn AG_OpenFile "const char *path" "const char *mode"
+.Pp
+.Ft "AG_DataSource *"
+.Fn AG_OpenFileHandle "FILE *f"
+.Pp
+.Ft "AG_DataSource *"
+.Fn AG_OpenCore "void *p" "AG_Size size"
+.Pp
+.Ft "AG_DataSource *"
+.Fn AG_OpenConstCore "const void *p" "AG_Size size"
+.Pp
+.Ft "AG_DataSource *"
+.Fn AG_OpenAutoCore "void"
+.Pp
+.Ft "AG_DataSource *"
+.Fn AG_OpenNetSocket "AG_NetSocket *ns"
+.Pp
+.Ft "void"
+.Fn AG_CloseDataSource "AG_DataSource *ds"
+.Pp
+.Ft "int"
+.Fn AG_Read "AG_DataSource *ds" "void *buf" "AG_Size size"
+.Pp
+.Ft "int"
+.Fn AG_ReadAt "AG_DataSource *ds" "void *buf" "AG_Size size" "AG_Offset pos"
+.Pp
+.Ft "int"
+.Fn AG_Write "AG_DataSource *ds" "const void *buf" "AG_Size size"
+.Pp
+.Ft "int"
+.Fn AG_WriteAt "AG_DataSource *ds" "const void *buf" "AG_Size size" "AG_Offset pos"
+.Pp
+.Ft "int"
+.Fn AG_ReadP "AG_DataSource *ds" "void *buf" "AG_Size size" "AG_Size *nRead"
+.Pp
+.Ft "int"
+.Fn AG_ReadAtP "AG_DataSource *ds" "void *buf" "AG_Size size" "AG_Offset pos" "AG_Size *nRead"
+.Pp
+.Ft "int"
+.Fn AG_WriteP "AG_DataSource *ds" "const void *buf" "AG_Size size" "AG_Size *nWrote"
+.Pp
+.Ft "int"
+.Fn AG_WriteAtP "AG_DataSource *ds" "const void *buf" "AG_Size size" "AG_Offset pos" "AG_Size *nWrote"
+.Pp
+.Ft "AG_Offset"
+.Fn AG_Tell "AG_DataSource *ds"
+.Pp
+.Ft "int"
+.Fn AG_Seek "AG_DataSource *ds" "AG_Offset offs" "enum ag_seek_mode mode"
+.Pp
+.Ft "void"
+.Fn AG_LockDataSource "AG_DataSource *ds"
+.Pp
+.Ft "void"
+.Fn AG_UnlockDataSource "AG_DataSource *ds"
+.Pp
+.Ft "AG_ByteOrder"
+.Fn AG_SetByteOrder "AG_DataSource *ds" "AG_ByteOrder order"
+.Pp
+.Ft "int"
+.Fn AG_SetSourceDebug "AG_DataSource *ds" "int enable"
+.Pp
+.Ft "void"
+.Fn AG_DataSourceInit "AG_DataSource *ds"
+.Pp
+.Ft "void"
+.Fn AG_DataSourceDestroy "AG_DataSource *ds"
+.Pp
+.Ft "void"
+.Fn AG_DataSourceSetErrorFn "AG_DataSource *ds" "void (*fn)(AG_Event *)" "const char *fmt" "..."
+.Pp
+.Ft "void"
+.Fn AG_DataSourceError "AG_DataSource *ds" "const char *fmt" "..."
+.Pp
+.Ft "int"
+.Fn AG_DataSourceRealloc "AG_CoreSource *dsCore" "AG_Size size"
+.Pp
+.nr nS 0
+The
+.Fn AG_OpenFile
+function opens the file at
+.Fa path ,
+where
+.Fa mode
+is a
+.Xr fopen 3
+style mode string.
+.Fn AG_OpenFileHandle
+creates a new data source for a previously opened file.
+.Pp
+The
+.Fn AG_OpenCore
+and
+.Fn AG_OpenConstCore
+functions create new data sources referencing the region of memory
+.Fa p
+of
+.Fa size
+bytes.
+.Pp
+.Fn AG_OpenAutoCore
+creates a new data source using dynamically-allocated memory (accessible
+as the
+.Va data
+member of the structure).
+.Pp
+.Fn AG_OpenNetSocket
+creates a new data source using a network socket (see
+.Xr AG_Net 3 ) .
+.Pp
+The
+.Fn AG_CloseDataSource
+function closes the data source, freeing any data allocated by the
+.Nm
+layer (such as the
+.Va data
+buffer allocated by
+.Fn AG_OpenAutoCore ) .
+For network sockets opened with
+.Fn AG_OpenNetSocket ,
+the underlying socket is left open.
+.Pp
+.Fn AG_Read
+reads
+.Fa size
+bytes from the data source into the destination buffer
+.Fa buf .
+.Fn AG_Write
+writes
+.Fa size
+bytes from the source buffer
+.Fa buf
+to the destination data source.
+.Fn AG_ReadAt
+and
+.Fn AG_WriteAt
+allow a source/target position (byte offset) to be specified.
+If an error has occurred, return -1 with an error message, otherwise 0 on success.
+Partial transfers are treated as errors.
+.Pp
+The
+.Fn AG_ReadP ,
+.Fn AG_WriteP ,
+.Fn AG_ReadAtP
+and
+.Fn AG_WriteAtP
+variants do not treat partial reads or writes as errors, returning the total
+number of bytes transferred into the
+.Fa nRead
+or
+.Fa nWrote
+argument (if not NULL).
+Depending on the underlying data source, a byte count of 0 may indicate
+either an end-of-file condition or a closed socket.
+.Pp
+.Fn AG_Tell
+returns the current position in the data source.
+If the underlying data source does not support this operation, a value
+of 0 is returned.
+.Pp
+.Fn AG_Seek
+seeks to the given position in the data source.
+Acceptable values for
+.Fa mode
+include
+.Dv AG_SEEK_SET
+(relative to data start),
+.Dv AG_SEEK_CUR
+(relative to current position),
+.Dv AG_SEEK_END
+(relative to data end).
+.Pp
+The
+.Fn AG_LockDataSource
+and
+.Fn AG_UnlockDataSource
+functions acquire and release the exclusive lock protecting this data
+source, and are no-ops if thread support is disabled.
+.Pp
+.Fn AG_SetByteOrder
+sets the effective byte order of the stream.
+Integer read/write operations must honor this setting.
+Byte orders are
+.Dv AG_BYTEORDER_BE
+for big-endian and
+.Dv AG_BYTEORDER_LE
+for little-endian.
+To determine the byte order of the current architecture, use macro
+.Dv AG_BYTEORDER
+macro (which evaluates to either
+.Dv AG_BIG_ENDIAN
+or
+.Dv AG_LITTLE_ENDIAN ) .
+.Pp
+.Fn AG_SetSourceDebug
+enables (1) or disables (0) the inclusion and checking of serialization
+markers on a data source.
+When enabled, typed I/O routines such as
+.Fn AG_WriteUint8
+will always write a marker (type code) before every byte, and
+.Fn AG_ReadUint8
+will always expect a type code (and verify that it matches, or raise an exception).
+.Fn AG_SetSourceDebug
+returns the previous setting.
+Serialization markers are enabled implicitely for
+.Xr AG_Object 3
+with
+.Dv AG_OBJECT_DEBUG_DATA .
+Available only with AG_DEBUG, no-op otherwise.
+.Pp
+The
+.Fn AG_DataSourceInit
+and
+.Fn AG_DataSourceDestroy
+functions are used when implementing new data source types.
+They are used internally by the
+.Fn AG_Open*
+and
+.Fn AG_Close*
+functions.
+.Pp
+.Fn AG_DataSourceSetErrorFn
+configures an alternate handler routine for data source exceptions (which
+can occur when using routines such as
+.Fn AG_ReadUint32 ,
+for example on I/O error).
+From the handler routine, a pointer to the
+.Ft AG_DataSource
+can be retrieved using
+.Dv AG_SELF ,
+and the error message is retrieved using
+.Dv AG_STRING(1) .
+The default exception handler calls
+.Xr AG_FatalError 3 .
+.Pp
+The
+.Fn AG_DataSourceError
+function raises a data source error, with the optional error message string.
+It is intended for use in custom I/O routines which do not return an error
+status.
+If
+.Fa fmt
+is NULL, the error is obtained from
+.Xr AG_GetError 3 .
+.Pp
+The
+.Fn AG_DataSourceRealloc
+routine explicitely resizes the buffer of a data source previously created
+with
+.Fn AG_OpenAutoCore .
+While the buffer is already resized automatically as data is written to
+the source, setting an explicit buffer size may be desirable in some
+situations.
+.Sh INTEGER OPERATIONS
+The following functions read and write integer values using the byte order
+specified for the data source.
+.Pp
+.nr nS 1
+.Ft Uint8
+.Fn AG_ReadUint8 "AG_DataSource *ds"
+.Pp
+.Ft Sint8
+.Fn AG_ReadSint8 "AG_DataSource *ds"
+.Pp
+.Ft Uint16
+.Fn AG_ReadUint16 "AG_DataSource *ds"
+.Pp
+.Ft Sint16
+.Fn AG_ReadSint16 "AG_DataSource *ds"
+.Pp
+.Ft Uint32
+.Fn AG_ReadUint32 "AG_DataSource *ds"
+.Pp
+.Ft Sint32
+.Fn AG_ReadSint32 "AG_DataSource *ds"
+.Pp
+.Ft int
+.Fn AG_ReadSint32 "AG_DataSource *ds" "Sint32 *v"
+.Pp
+.Ft Uint64
+.Fn AG_ReadUint64 "AG_DataSource *ds"
+.Pp
+.Ft Sint64
+.Fn AG_ReadSint64 "AG_DataSource *ds"
+.Pp
+.Ft void
+.Fn AG_WriteUint8 "AG_DataSource *ds" "Uint8 value"
+.Pp
+.Ft void
+.Fn AG_WriteSint8 "AG_DataSource *ds" "Sint8 value"
+.Pp
+.Ft void
+.Fn AG_WriteUint16 "AG_DataSource *ds" "Uint16 value"
+.Pp
+.Ft void
+.Fn AG_WriteSint16 "AG_DataSource *ds" "Sint16 value"
+.Pp
+.Ft void
+.Fn AG_WriteUint32 "AG_DataSource *ds" "Uint32 value"
+.Pp
+.Ft void
+.Fn AG_WriteSint32 "AG_DataSource *ds" "Sint32 value"
+.Pp
+.Ft void
+.Fn AG_WriteUint64 "AG_DataSource *ds" "Uint64 value"
+.Pp
+.Ft void
+.Fn AG_WriteSint64 "AG_DataSource *ds" "Sint64 value"
+.Pp
+.Ft void
+.Fn AG_WriteUint8At "AG_DataSource *ds" "Uint8 value" "AG_Offset offs"
+.Pp
+.Ft void
+.Fn AG_WriteSint8At "AG_DataSource *ds" "Sint8 value" "AG_Offset offs"
+.Pp
+.Ft void
+.Fn AG_WriteUint16At "AG_DataSource *ds" "Uint16 value" "AG_Offset offs"
+.Pp
+.Ft void
+.Fn AG_WriteSint16At "AG_DataSource *ds" "Sint16 value" "AG_Offset offs"
+.Pp
+.Ft void
+.Fn AG_WriteUint32At "AG_DataSource *ds" "Uint32 value" "AG_Offset offs"
+.Pp
+.Ft void
+.Fn AG_WriteSint32At "AG_DataSource *ds" "Sint32 value" "AG_Offset offs"
+.Pp
+.Ft void
+.Fn AG_WriteUint64At "AG_DataSource *ds" "Uint64 value" "AG_Offset offs"
+.Pp
+.Ft void
+.Fn AG_WriteSint64At "AG_DataSource *ds" "Sint64 value" "AG_Offset offs"
+.nr nS 0
+.Pp
+The
+.Fn AG_Read[SU]intN
+functions read a N-bit integer from
+.Fa ds .
+They swap the byte order if the host byte order differs from that of the
+data source.
+.Pp
+The
+.Fn AG_Write[SU]intN
+functions write a N-byte integer to
+.Fa ds .
+.Pp
+Both
+.Fn AG_Read[SU]inN
+and
+.Fn AG_Write[SU]intN
+swap the byte order if the host byte order differs from that of the
+data source.
+.Pp
+The
+.Fn AG_Write[SU]intNAt
+functions write an integer to the specified position in the data source,
+swapping the byte order as needed.
+.Sh FLOATING POINT OPERATIONS
+The following routines read and write floating-point numbers in IEEE.754
+representation.
+.Pp
+.nr nS 1
+.Ft "float"
+.Fn AG_ReadFloat "AG_DataSource *ds"
+.Pp
+.Ft "double"
+.Fn AG_ReadDouble "AG_DataSource *ds"
+.Pp
+.Ft "void"
+.Fn AG_WriteFloat "AG_DataSource *ds" "float f"
+.Pp
+.Ft "void"
+.Fn AG_WriteFloatAt "AG_DataSource *ds" "float f" "AG_Offset pos"
+.Pp
+.Ft "void"
+.Fn AG_WriteDouble "AG_DataSource *ds" "double f"
+.Pp
+.Ft "void"
+.Fn AG_WriteDoubleAt "AG_DataSource *ds" "double f" "AG_Offset pos"
+.Pp
+.nr nS 0
+.Fn AG_ReadFloat
+and
+.Fn AG_ReadDouble
+read a floating-point value from the data source.
+.Pp
+.Fn AG_WriteFloat
+and
+.Fn AG_WriteDouble
+write a floating-point value to the data source.
+The
+.Fn AG_Write*At
+variants write the value at a given position.
+.Pp
+All
+.Fn AG_Read*v
+functions return 0 on success and -1 on failure, without raising any
+exceptions.
+The other functions will raise a data source exception if an failuer (e.g.,
+an I/O error) occurred.
+.Sh STRING OPERATIONS
+The following functions read and write C strings.
+The serialized representation includes an unsigned 32-bit count followed
+by the (possibly padded or NUL-terminated) string of characters itself.
+.Pp
+.nr nS 1
+.Ft "char *"
+.Fn AG_ReadString "AG_DataSource *ds"
+.Pp
+.Ft "char *"
+.Fn AG_ReadStringLen "AG_DataSource *ds" "AG_Size maxLen"
+.Pp
+.Ft AG_Size
+.Fn AG_CopyString "char *buf" "AG_DataSource *ds" "size buf_size"
+.Pp
+.Ft "char *"
+.Fn AG_ReadStringPadded "AG_DataSource *ds" "AG_Size len"
+.Pp
+.Ft AG_Size
+.Fn AG_CopyStringPadded "char *buf" "AG_DataSource *ds" "size buf_size"
+.Pp
+.Ft "char *"
+.Fn AG_ReadNulString "AG_DataSource *ds"
+.Pp
+.Ft "char *"
+.Fn AG_ReadNulStringLen "AG_DataSource *ds" "AG_Size maxLen"
+.Pp
+.Ft AG_Size
+.Fn AG_CopyNulString "char *buf" "AG_DataSource *ds" "size buf_size"
+.Pp
+.Ft void
+.Fn AG_SkipString "AG_DataSource *ds"
+.Pp
+.Ft void
+.Fn AG_SkipStringPadded "AG_DataSource *ds"
+.Pp
+.Ft void
+.Fn AG_WriteString "AG_DataSource *ds" "const char *s"
+.Pp
+.Ft void
+.Fn AG_WriteStringPadded "AG_DataSource *ds" "const char *s" "AG_Size len"
+.Pp
+.nr nS 0
+.Fn AG_ReadString
+reads a string of up to
+.Dv AG_LOAD_STRING_MAX
+bytes from
+.Fa ds .
+On success, a newly-allocated, NUL-terminated copy of string is returned.
+.Fn AG_ReadStringLen
+reads a string of up to
+.Fa maxLen
+bytes in length.
+.Pp
+.Fn AG_CopyString
+reads an encoded string and returns its contents into a fixed-size buffer
+.Fa buf
+of
+.Fa buf_size .
+.Fn AG_CopyString
+returns the number of bytes that would have been copied were
+.Fa buf_size
+unlimited.
+.Pp
+.Fn AG_ReadStringPadded
+reads a fixed-length string record of
+.Fa len
+bytes in length.
+.Fn AG_CopyStringPadded
+reads a fixed-length string record and copies the NUL-terminated result into
+a fixed-size buffer
+.Fa buf
+of
+.Fa buf_size .
+.Pp
+The
+.Fn AG_ReadNulString ,
+.Fn AG_ReadNulStringLen
+and
+.Fn AG_CopyNulString
+routines read a serialized, 32-bit length-encoded string which includes the
+NUL termination in the encoding.
+.Pp
+The
+.Fn AG_SkipString
+routine skips over the string at the current position in the buffer.
+.Pp
+The
+.Fn AG_WriteString
+function writes a C string to a data source, in a variable-length encoding.
+The encoding is a 32-bit representation of
+.Xr strlen 3
+followed by the string itself.
+.Pp
+.Fn AG_WriteStringPadded
+serializes a string into a fixed-length record composed of a 32-bit
+representation of
+.Xr strlen 3
+followed by the string plus extra padding such that the serialized record
+is always guaranteed to be
+.Fa length
+bytes + 4 in size.
+.Pp
+On failure, the
+.Fn AG_WriteString
+routines raise a data source exception.
+.Sh DERIVING NEW SOURCES
+New sources can be implemented by deriving the
+.Nm
+structure:
+.Bd -literal
+typedef AG_DataSource {
+  AG_Mutex lock;                    /* Lock on all operations */
+  enum ag_byte_order byte_order;    /* Byte order of source */
+
+  AG_Size wrLast;                   /* Last write count (bytes) */
+  AG_Size rdLast;                   /* Last read count (bytes) */
+  AG_Size wrTotal;                  /* Total write count (bytes) */
+  AG_Size rdTotal;                  /* Total read count (bytes) */
+
+  int (*read)(AG_DataSource *, void *, AG_Size, AG_Size *);
+  int (*read_at)(AG_DataSource *, void *, AG_Size, AG_Offset, AG_Size *);
+  int (*write)(AG_DataSource *, const void *, AG_Size, AG_Size *);
+  int (*write_at)(AG_DataSource *, const void *, AG_Size, AG_Offset,
+                  AG_Size *);
+  AG_Offset (*tell)(AG_DataSource *);
+  int (*seek)(AG_DataSource *, AG_Offset offs, enum ag_seek_mode mode);
+  void (*close)(AG_DataSource *);
+} AG_DataSource;
+.Ed
+.Pp
+The
+.Va byte_order
+field is set by
+.Fn AG_SetByteOrder
+and controls the endianness of integer serialization operations such as
+.Fn AG_ReadUint32 .
+.Pp
+The
+.Va wrLast ,
+.Va rdLast ,
+.Va wrTotal
+and
+.Va rdTotal
+fields keep count of the read/written bytes, and are automatically
+incremented by serialization operations such as
+.Fn AG_ReadUint32 .
+.Pp
+The
+.Fn read
+operation reads
+.Fa size
+bytes from the data source and into
+.Fa buf ,
+returning the total number of bytes read into
+.Fa rv .
+.Fn read_at
+reads data at a specified offset.
+.Pp
+The
+.Fn write
+operation writes
+.Fa size
+bytes from
+.Fa buf
+to the data source, returning the total number of bytes written into
+.Fa rv .
+The
+.Fn write_at
+variant writes the data at a specified offset.
+.Pp
+.Fn tell
+returns the current offset.
+.Pp
+.Fn seek
+moves to the specified offset and returns 0 on success and -1 on failure.
+.Pp
+.Fn close
+closes the data source.
+.Sh SEE ALSO
+.Xr AG_ByteSwap 3 ,
+.Xr AG_Intro 3 ,
+.Xr AG_Net 3 ,
+.Xr AG_Version 3
+.Sh HISTORY
+A similar interface called
+.Sq AG_Netbuf
+first appeared in Agar 1.0.
+The current
+.Nm
+interface appeared in Agar 1.3.
+Exception handling and error-checking variants of the primitive I/O routines
+appeared in Agar 1.3.3.
+The interface to network sockets appeared in Agar 1.5.0.
+.Fn AG_ReadStringPadded 
+and
+.Fn AG_CopyStringPadded
+appeared in Agar 1.6.0.

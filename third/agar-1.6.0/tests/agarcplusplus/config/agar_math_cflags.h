@@ -1,0 +1,1 @@
+#undef AGAR_MATH_CFLAGS

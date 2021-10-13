@@ -1,0 +1,1843 @@
+# BSDBuild 3.2 <https://bsdbuild.hypertriton.com/>
+# ex:syn=sh
+env CC="/home/elchaschab/emsdk/upstream/emscripten/emcc" CFLAGS="-msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1" LDFLAGS="-s WASM_BIGINT -s MALLOC=emmalloc -s STACK_OVERFLOW_CHECK=0 -s ASSERTIONS=0 -s SAFE_HEAP=0 --closure 1 -menable-unsafe-fp-math -s USE_FREETYPE=1 -s USE_LIBPNG=1" ./configure --with-sdl --without-x --without-glx --without-xinerama --with-png --without-jpeg --without-gl --with-fontconfig --with-freetype --without-portaudio --without-sndfile --without-db4 --disable-network --enable-gui
+# checking for a C compiler...using /home/elchaschab/emsdk/upstream/emscripten/emcc
+# checking whether the C compiler works...yes
+# cc: checking whether compiler is Clang...
+# C: HAVE_CC_CLANG
+cat << EOT >conftest19758.c
+#if !defined(__clang__)
+# error "is not clang"
+#endif
+int main(int argc, char *argv[]) { return (0); }
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1   -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# cc: checking whether compiler is GCC...
+# C: HAVE_CC_GCC
+cat << EOT >conftest19758.c
+#if !defined(__GNUC__) || defined(__clang__)
+# error "is not gcc"
+#endif
+int main(int argc, char *argv[]) { return (0); }
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1   -o ./conftest19758 conftest19758.c  2>>config.log
+conftest19758.c:2:3: error: "is not gcc"
+# error "is not gcc"
+  ^
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros conftest19758.c -c -o /tmp/emscripten_temp_jrf_6i9r/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# cc: checking for compiler warning options...
+# C: HAVE_CC_WARNINGS
+cat << EOT >conftest19758.c
+int main(int argc, char *argv[]) { return (0); }
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1  -Wall -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# cc: checking for float and double...
+# C: HAVE_FLOAT
+cat << EOT >conftest19758.c
+#include <stdio.h>
+int
+main(int argc, char *argv[])
+{
+	float f = 0.1f;
+	double d = 0.2;
+
+	printf("%f", f);
+	return ((double)f + d) > 0.2 ? 1 : 0;
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# cc: checking for long double...
+# C: HAVE_LONG_DOUBLE
+cat << EOT >conftest19758.c
+#include <stdio.h>
+int
+main(int argc, char *argv[])
+{
+	long double ld = 0.1;
+
+	printf("%Lf", ld);
+	return (ld + 0.1) > 0.2 ? 1 : 0;
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# cc: checking for long long...
+# C: HAVE_LONG_LONG
+cat << EOT >conftest19758.c
+int
+main(int argc, char *argv[])
+{
+	long long ll = -1;
+	unsigned long long ull = 1;
+
+	return (ll != -1 || ull != 1);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# cc: checking for cygwin environment...
+# C: HAVE_CYGWIN
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <windows.h>
+
+int
+main(int argc, char *argv[]) {
+	struct stat sb;
+	DWORD rv;
+	rv = GetFileAttributes("foo");
+	stat("foo", &sb);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -mcygwin -o ./conftest19758 conftest19758.c 2>>config.log
+clang-14: error: unknown argument: '-mcygwin'
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall -mcygwin conftest19758.c -c -o /tmp/emscripten_temp_2lxldms5/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# cc: checking for -mwindows option...
+# C: HAVE_CC_MWINDOWS
+cat << EOT >conftest19758.c
+#include <windows.h>
+int
+main(int argc, char *argv[]) {
+	return GetFileAttributes("foo") ? 0 : 1;
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -mwindows -o ./conftest19758 conftest19758.c 2>>config.log
+clang-14: warning: argument unused during compilation: '-mwindows' [-Wunused-command-line-argument]
+conftest19758.c:1:10: fatal error: 'windows.h' file not found
+#include <windows.h>
+         ^~~~~~~~~~~
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall -mwindows conftest19758.c -c -o /tmp/emscripten_temp_ebvzfz1h/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# cc: checking for -mconsole option...
+# C: HAVE_CC_MCONSOLE
+cat << EOT >conftest19758.c
+#include <windows.h>
+int
+main(int argc, char *argv[]) {
+	return GetFileAttributes("foo") ? 0 : 1;
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -mconsole -o ./conftest19758 conftest19758.c 2>>config.log
+clang-14: warning: argument unused during compilation: '-mconsole' [-Wunused-command-line-argument]
+conftest19758.c:1:10: fatal error: 'windows.h' file not found
+#include <windows.h>
+         ^~~~~~~~~~~
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall -mconsole conftest19758.c -c -o /tmp/emscripten_temp_q43xvw9y/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for Objective-C compiler...yes, /usr/bin/clang
+# checking whether the Objective-C compiler works...yes
+# objc: checking for compiler warning options...
+# ObjC: HAVE_OBJC_WARNINGS
+cat << EOT >conftest19758.m
+int main(int argc, char *argv[]) { return (0); }
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -Wall -x objective-c -o ./conftest19758 conftest19758.m  2>>config.log
+# yes
+# checking for byte order.../home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1  -o ./conftest conftest.c
+# big-endian
+# checking for C compiler attributes...
+# C: HAVE_ALIGNED_ATTRIBUTE
+cat << EOT >conftest19758.c
+int main(int argc, char *argv[])
+{
+	struct s1 { int x,y,z; } __attribute__ ((aligned(16)));
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -Wall -Werror -o ./conftest19758 conftest19758.c 2>>config.log
+# aligned 
+# C: HAVE_BOUNDED_ATTRIBUTE
+cat << EOT >conftest19758.c
+void foostring(char *, int) __attribute__ ((__bounded__(__string__,1,2)));
+void foostring(char *a, int c) { }
+void foobuffer(void *, int) __attribute__ ((__bounded__(__buffer__,1,2)));
+void foobuffer(void *a, int c) { }
+int main(void)
+{
+	char buf[32];
+	foostring(buf, sizeof(buf));
+	foobuffer(buf, sizeof(buf));
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# bounded 
+# C: HAVE_CONST_ATTRIBUTE
+cat << EOT >conftest19758.c
+int foo(int) __attribute__ ((const));
+int foo(int x) { return (x*x); }
+int main(int argc, char *argv[])
+{
+	int x = foo(1);
+	return (x);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -Wall -Werror -o ./conftest19758 conftest19758.c 2>>config.log
+# const 
+# C: HAVE_DEPRECATED_ATTRIBUTE
+cat << EOT >conftest19758.c
+void foo(void) __attribute__ ((deprecated));
+void foo(void) { }
+
+int main(int argc, char *argv[])
+{
+/*	foo(); */
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -Wall -Werror -o ./conftest19758 conftest19758.c 2>>config.log
+# deprecated 
+# C: HAVE_FORMAT_ATTRIBUTE
+cat << EOT >conftest19758.c
+#include <stdarg.h>
+void foo1(char *, ...)
+     __attribute__((__format__ (printf, 1, 2)));
+void foo2(char *, ...)
+     __attribute__((__format__ (__printf__, 1, 2)));
+void foo1(char *a, ...) {}
+void foo2(char *a, ...) {}
+int main(int argc, char *argv[])
+{
+	foo1("foo %s", "bar");
+	foo2("foo %d", 1);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# format
+# checking for C compiler attributes...
+# C: HAVE_MALLOC_ATTRIBUTE
+cat << EOT >conftest19758.c
+#include <stdio.h>
+#include <stdlib.h>
+
+void *myalloc(size_t len) __attribute__ ((__malloc__));
+void *myalloc(size_t len) { return (NULL); }
+int main(int argc, char *argv[])
+{
+	void *p = myalloc(10);
+	return (p != NULL);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -Wall -Werror -o ./conftest19758 conftest19758.c 2>>config.log
+# malloc 
+# C: HAVE_NORETURN_ATTRIBUTE
+cat << EOT >conftest19758.c
+#include <unistd.h>
+#include <stdlib.h>
+void foo(void) __attribute__ ((noreturn));
+void foo(void) { _exit(0); }
+int main(int argc, char *argv[])
+{
+	foo();
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -Wall -Werror -o ./conftest19758 conftest19758.c 2>>config.log
+# noreturn 
+# C: HAVE_PACKED_ATTRIBUTE
+cat << EOT >conftest19758.c
+int main(int argc, char *argv[])
+{
+	struct s1 { char c; int x,y,z; } __attribute__ ((packed));
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -Wall -Werror -o ./conftest19758 conftest19758.c 2>>config.log
+# packed 
+# C: HAVE_PURE_ATTRIBUTE
+cat << EOT >conftest19758.c
+volatile int glo = 1234;
+int foo(int) __attribute__ ((pure));
+int foo(int x) { return (x*x + glo); }
+int main(int argc, char *argv[])
+{
+	int x = foo(1);
+	glo = 2345;
+	x = foo(2);
+	return (x);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -Wall -Werror -o ./conftest19758 conftest19758.c 2>>config.log
+# pure 
+# C: HAVE_UNUSED_VARIABLE_ATTRIBUTE
+cat << EOT >conftest19758.c
+int main(int argc, char *argv[])
+{
+	int __attribute__ ((unused)) variable;
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -Wall -Werror -o ./conftest19758 conftest19758.c 2>>config.log
+# unused
+# checking for C compiler attributes...
+# C: HAVE_WARN_UNUSED_RESULT_ATTRIBUTE
+cat << EOT >conftest19758.c
+int foo(void) __attribute__ ((warn_unused_result));
+int foo(void) { return (1); }
+int main(int argc, char *argv[])
+{
+	int rv = foo();
+	return (rv);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -Wall -Werror -o ./conftest19758 conftest19758.c 2>>config.log
+# warn_unused_result 
+# checking for <sys/types.h>...
+# C: _MK_HAVE_SYS_TYPES_H
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+int main(int argc, char *argv[]) {
+	int8_t s8 = 2;
+	u_int8_t u8 = 2;
+	int32_t s32 = 1234;
+	u_int32_t u32 = 5678;
+	return (s8+u8 == 4 && s32+u32 > 6000 ? 0 : 1);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# checking for <stdint.h>...
+# C: _MK_HAVE_STDINT_H
+cat << EOT >conftest19758.c
+#include <stdint.h>
+int main(int argc, char *argv[]) {
+	int8_t s8 = 2;
+	uint8_t u8 = 2;
+	int32_t s32 = 1234;
+	uint32_t u32 = 5678;
+	return (s8+u8 == 4 && s32+u32 > 6000 ? 0 : 1);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# checking for int64_t type...
+# C: HAVE_INT64_T
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <stdio.h>
+int main(int argc, char *argv[]) {
+	int64_t i64 = 0;
+	u_int64_t u64 = 0;
+	printf("%lld %llu", (long long)i64, (unsigned long long)u64);
+	return (i64 != 0 || u64 != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# checking for __int64 type...
+# C: HAVE___INT64
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <stdio.h>
+int main(int argc, char *argv[]) {
+	__int64 i64 = 0;
+	printf("%lld", (long long)i64);
+	return (i64 != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+conftest19758.c:4:2: error: use of undeclared identifier '__int64'
+        __int64 i64 = 0;
+        ^
+conftest19758.c:5:28: error: use of undeclared identifier 'i64'
+        printf("%lld", (long long)i64);
+                                  ^
+conftest19758.c:6:10: error: use of undeclared identifier 'i64'
+        return (i64 != 0);
+                ^
+3 errors generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall conftest19758.c -c -o /tmp/emscripten_temp_lutpbkwt/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for <sys/stat.h>...
+# C: _MK_HAVE_SYS_STAT_H
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/stat.h>
+int main(int argc, char *argv[]) {
+	struct stat sb;
+	uid_t uid;
+	if (stat("/tmp/foo", &sb) != 0) { return (1); }
+	return ((uid = sb.st_uid) == (uid_t)0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# checking for <stdlib.h>...
+# C: _MK_HAVE_STDLIB_H
+cat << EOT >conftest19758.c
+#include <stdlib.h>
+int main(int argc, char *argv[]) {
+	void *foo = malloc(1);
+	free(foo);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# checking for <unistd.h>...
+# C: _MK_HAVE_UNISTD_H
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <unistd.h>
+int main(int argc, char *argv[]) {
+	char buf;
+	int rv, fdout=1;
+
+	if ((rv = write(fdout, (void *)&buf, 1)) < 1) { return (1); }
+	if ((rv = read(0, (void *)&buf, 1)) < 1) { return (1); }
+	if (unlink("/tmp/foo") != 0) { return (1); }
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# checking for compatible <limits.h>...
+# C: _MK_HAVE_LIMITS_H
+cat << EOT >conftest19758.c
+#include <limits.h>
+
+int main(int argc, char *argv[]) {
+	int i = INT_MIN;
+	unsigned u = 0;
+	long l = LONG_MIN;
+	unsigned long ul = 0;
+	i = INT_MAX;
+	u = UINT_MAX;
+	l = LONG_MAX;
+	ul = ULONG_MAX;
+	return (i != INT_MAX || u != UINT_MAX || l != LONG_MAX || ul != LONG_MAX);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# checking for <float.h>...
+# C: _MK_HAVE_FLOAT_H
+cat << EOT >conftest19758.c
+#include <float.h>
+
+int main(int argc, char *argv[]) {
+	float flt = 0.0f;
+	double dbl = 0.0;
+
+	flt += FLT_EPSILON;
+	dbl += DBL_EPSILON;
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+conftest19758.c:4:8: warning: variable 'flt' set but not used [-Wunused-but-set-variable]
+        float flt = 0.0f;
+              ^
+conftest19758.c:5:9: warning: variable 'dbl' set but not used [-Wunused-but-set-variable]
+        double dbl = 0.0;
+               ^
+2 warnings generated.
+# yes
+# checking for the C math library...
+# C: HAVE_MATH
+cat << EOT >conftest19758.c
+#include <math.h>
+
+int
+main(int argc, char *argv[])
+{
+	double d = 1.0;
+	d = fabs(d);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1  -o ./conftest19758 conftest19758.c -lm 2>>config.log
+# yes
+# checking for the C math library (C99)...
+# C: HAVE_MATH_C99
+cat << EOT >conftest19758.c
+#include <math.h>
+
+int
+main(int argc, char *argv[])
+{
+	float f = 1.0;
+	double d = 1.0;
+
+	d = fabs(d);
+	f = sqrtf(fabsf(f));
+	return (f > d) ? 0 : 1;
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1  -o ./conftest19758 conftest19758.c -lm 2>>config.log
+# yes
+# checking for a fdclose() function...
+# C: HAVE_FDCLOSE
+cat << EOT >conftest19758.c
+#include <stdio.h>
+int
+main(int argc, char *argv[])
+{
+	FILE *f = fopen("/dev/null","r");
+	int fdp;
+	return fdclose(f, &fdp);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+conftest19758.c:7:9: error: implicit declaration of function 'fdclose' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+        return fdclose(f, &fdp);
+               ^
+conftest19758.c:7:9: note: did you mean 'fclose'?
+/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/stdio.h:75:5: note: 'fclose' declared here
+int fclose(FILE *);
+    ^
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall conftest19758.c -c -o /tmp/emscripten_temp_vk972slv/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for getpwuid()...
+# C: HAVE_GETPWUID
+cat << EOT >conftest19758.c
+#include <string.h>
+#include <sys/types.h>
+#include <pwd.h>
+
+int
+main(int argc, char *argv[])
+{
+	struct passwd *pwd;
+	uid_t uid = 0;
+
+	pwd = getpwuid(uid);
+	return (pwd != NULL && pwd->pw_dir != NULL);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for the getpwnam_r() interface...
+# C: HAVE_GETPWNAM_R
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <pwd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+
+int
+main(int argc, char *argv[])
+{
+	struct passwd pw, *res;
+	char *buf;
+	size_t bufSize;
+	int rv;
+
+	bufSize = sysconf(_SC_GETPW_R_SIZE_MAX);
+	if (bufSize == -1) { bufSize = 16384; }
+	if ((buf = malloc(bufSize)) == NULL) { return (1); }
+
+	rv = getpwnam_r("foo", &pw, buf, bufSize, &res);
+	if (res == NULL) {
+		return (rv == 0);
+	}
+	return (pw.pw_dir != NULL);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for getenv()...
+# C: HAVE_GETENV
+cat << EOT >conftest19758.c
+#include <stdlib.h>
+int
+main(int argc, char *argv[])
+{
+	(void)getenv("PATH");
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for getuid()...
+# C: HAVE_GETUID
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <unistd.h>
+
+int
+main(int argc, char *argv[])
+{
+	uid_t uid = getuid();
+	return (uid != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for strsep()...
+# C: HAVE_STRSEP
+cat << EOT >conftest19758.c
+#include <string.h>
+int
+main(int argc, char *argv[])
+{
+	char foo[32], *pFoo = &foo[0];
+	char *s;
+
+	foo[0] = '\0';
+	s = strsep(&pFoo, " ");
+	return (s != NULL);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for asprintf()...
+# C: HAVE_ASPRINTF
+cat << EOT >conftest19758.c
+#include <stdio.h>
+
+int
+main(int argc, char *argv[])
+{
+	char *buf;
+	if (asprintf(&buf, "foo %s", "bar") == 0) {
+	    return (0);
+	}
+	return (1);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -D_GNU_SOURCE -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for snprintf()...
+# C: HAVE_SNPRINTF
+cat << EOT >conftest19758.c
+#include <stdio.h>
+
+int
+main(int argc, char *argv[])
+{
+	char buf[16];
+	(void)snprintf(buf, sizeof(buf), "foo");
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for vsnprintf()...
+# C: HAVE_VSNPRINTF
+cat << EOT >conftest19758.c
+#include <stdio.h>
+#include <stdarg.h>
+
+static void
+testfmt(const char *fmt, ...)
+{
+	char buf[16];
+	va_list ap;
+	va_start(ap, fmt);
+	(void)vsnprintf(buf, sizeof(buf), fmt, ap);
+	va_end(ap);
+}
+int
+main(int argc, char *argv[])
+{
+	testfmt("foo", 1, 2, 3);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for vasprintf()...
+# C: HAVE_VASPRINTF
+cat << EOT >conftest19758.c
+#include <stdio.h>
+#include <stdarg.h>
+
+int
+testprintf(const char *fmt, ...)
+{
+	va_list args;
+	char *buf;
+
+	va_start(args, fmt);
+	if (vasprintf(&buf, "%s", args) == -1) {
+		return (-1);
+	}
+	va_end(args);
+	return (0);
+}
+int
+main(int argc, char *argv[])
+{
+	return (testprintf("foo %s", "bar"));
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -D_GNU_SOURCE -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for ANSI-style signal() facilities...
+# C: _MK_HAVE_SIGNAL
+cat << EOT >conftest19758.c
+#include <signal.h>
+void sighandler(int sig) { }
+int
+main(int argc, char *argv[])
+{
+	signal(SIGTERM, sighandler);
+	signal(SIGILL, sighandler);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for setjmp() and longjmp()...
+# C: _MK_HAVE_SETJMP
+cat << EOT >conftest19758.c
+#include <setjmp.h>
+
+jmp_buf jmpbuf;
+
+int
+main(int argc, char *argv[])
+{
+	longjmp(jmpbuf, 1);
+	setjmp(jmpbuf);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for strtoll()...
+# C: _MK_HAVE_STRTOLL
+cat << EOT >conftest19758.c
+#include <stdlib.h>
+
+int
+main(int argc, char *argv[])
+{
+	long long int lli;
+	char *ep = NULL;
+	char *foo = "1234";
+
+	lli = strtoll(foo, &ep, 10);
+	return (lli != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for strtold()...
+# C: _MK_HAVE_STRTOLD
+cat << EOT >conftest19758.c
+#ifndef __NetBSD__
+# define _XOPEN_SOURCE 600
+#endif
+#include <stdlib.h>
+int
+main(int argc, char *argv[])
+{
+	long double ld;
+	char *ep = NULL;
+	char *foo = "1234";
+
+	ld = strtold(foo, &ep);
+	return (ld != 1234.0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for dlopen() interface...
+# C: HAVE_DLOPEN
+cat << EOT >conftest19758.c
+#include <string.h>
+#ifdef HAVE_DLFCN_H
+#include <dlfcn.h>
+#endif
+
+int
+main(int argc, char *argv[])
+{
+	void *handle;
+	char *error;
+	handle = dlopen("foo.so", 0);
+	error = dlerror();
+	(void)dlsym(handle, "foo");
+	return (error != NULL);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -DHAVE_DLFCN_H -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for dyld interface...conftest19758.c:2:10: fatal error: 'mach-o/dyld.h' file not found
+#include <mach-o/dyld.h>
+         ^~~~~~~~~~~~~~~
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall conftest19758.c -c -o /tmp/emscripten_temp_rbpytnrw/conftest19758_0.o' failed (returned 1)
+# failed 0
+
+# C: HAVE_DYLD
+cat << EOT >conftest19758.c
+#ifdef __APPLE__
+# include <Availability.h>
+# ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+#  if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
+#   error "deprecated in Leopard and later"
+#  endif
+# endif
+#endif
+
+#ifdef HAVE_MACH_O_DYLD_H
+#include <mach-o/dyld.h>
+#endif
+
+int
+main(int argc, char *argv[])
+{
+	NSObjectFileImage img;
+	NSObjectFileImageReturnCode rv;
+
+	rv = NSCreateObjectFileImageFromFile("foo", &img);
+	return (rv == NSObjectFileImageSuccess);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+conftest19758.c:17:2: error: use of undeclared identifier 'NSObjectFileImage'
+        NSObjectFileImage img;
+        ^
+conftest19758.c:18:2: error: use of undeclared identifier 'NSObjectFileImageReturnCode'
+        NSObjectFileImageReturnCode rv;
+        ^
+conftest19758.c:20:2: error: use of undeclared identifier 'rv'
+        rv = NSCreateObjectFileImageFromFile("foo", &img);
+        ^
+conftest19758.c:20:7: error: implicit declaration of function 'NSCreateObjectFileImageFromFile' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+        rv = NSCreateObjectFileImageFromFile("foo", &img);
+             ^
+conftest19758.c:20:47: error: use of undeclared identifier 'img'
+        rv = NSCreateObjectFileImageFromFile("foo", &img);
+                                                     ^
+conftest19758.c:21:10: error: use of undeclared identifier 'rv'
+        return (rv == NSObjectFileImageSuccess);
+                ^
+conftest19758.c:21:16: error: use of undeclared identifier 'NSObjectFileImageSuccess'
+        return (rv == NSObjectFileImageSuccess);
+                      ^
+7 errors generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall conftest19758.c -c -o /tmp/emscripten_temp_1quled5f/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for the shl_load() interface...conftest19758.c:2:10: fatal error: 'dl.h' file not found
+#include <dl.h>
+         ^~~~~~
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall conftest19758.c -c -o /tmp/emscripten_temp_jlq1ozud/conftest19758_0.o' failed (returned 1)
+# failed 0
+
+# C: HAVE_SHL_LOAD
+cat << EOT >conftest19758.c
+#include <string.h>
+#ifdef HAVE_DL_H
+#include <dl.h>
+#endif
+
+int
+main(int argc, char *argv[])
+{
+	void *handle;
+	void **p;
+
+	handle = shl_load("foo.so", BIND_IMMEDIATE, 0);
+	(void)shl_findsym((shl_t *)&handle, "foo", TYPE_PROCEDURE, p);
+	(void)shl_findsym((shl_t *)&handle, "foo", TYPE_DATA, p);
+	shl_unload((shl_t)handle);
+	return (handle != NULL);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -ldld -o ./conftest19758 conftest19758.c 2>>config.log
+conftest19758.c:12:11: error: implicit declaration of function 'shl_load' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+        handle = shl_load("foo.so", BIND_IMMEDIATE, 0);
+                 ^
+conftest19758.c:12:30: error: use of undeclared identifier 'BIND_IMMEDIATE'
+        handle = shl_load("foo.so", BIND_IMMEDIATE, 0);
+                                    ^
+conftest19758.c:13:8: error: implicit declaration of function 'shl_findsym' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+        (void)shl_findsym((shl_t *)&handle, "foo", TYPE_PROCEDURE, p);
+              ^
+conftest19758.c:13:21: error: use of undeclared identifier 'shl_t'; did you mean 'short'?
+        (void)shl_findsym((shl_t *)&handle, "foo", TYPE_PROCEDURE, p);
+                           ^~~~~
+                           short
+conftest19758.c:13:21: error: expected expression
+conftest19758.c:13:45: error: use of undeclared identifier 'TYPE_PROCEDURE'
+        (void)shl_findsym((shl_t *)&handle, "foo", TYPE_PROCEDURE, p);
+                                                   ^
+conftest19758.c:14:21: error: use of undeclared identifier 'shl_t'; did you mean 'short'?
+        (void)shl_findsym((shl_t *)&handle, "foo", TYPE_DATA, p);
+                           ^~~~~
+                           short
+conftest19758.c:14:21: error: expected expression
+conftest19758.c:14:45: error: use of undeclared identifier 'TYPE_DATA'
+        (void)shl_findsym((shl_t *)&handle, "foo", TYPE_DATA, p);
+                                                   ^
+conftest19758.c:15:2: error: implicit declaration of function 'shl_unload' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+        shl_unload((shl_t)handle);
+        ^
+conftest19758.c:15:2: note: did you mean 'shl_load'?
+conftest19758.c:12:11: note: 'shl_load' declared here
+        handle = shl_load("foo.so", BIND_IMMEDIATE, 0);
+                 ^
+conftest19758.c:15:14: error: use of undeclared identifier 'shl_t'; did you mean 'short'?
+        shl_unload((shl_t)handle);
+                    ^~~~~
+                    short
+conftest19758.c:15:20: error: expected ')'
+        shl_unload((shl_t)handle);
+                          ^
+conftest19758.c:15:12: note: to match this '('
+        shl_unload((shl_t)handle);
+                  ^
+12 errors generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall conftest19758.c -c -o /tmp/emscripten_temp_vhso16wn/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for gettimeofday()...
+# C: HAVE_GETTIMEOFDAY
+cat << EOT >conftest19758.c
+#include <sys/time.h>
+#include <stdio.h>
+
+int
+main(int argc, char *argv[])
+{
+	struct timeval tv;
+	int rv = gettimeofday(&tv, NULL);
+	return (rv);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for the select() interface...
+# C: HAVE_SELECT
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/time.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+
+int
+main(int argc, char *argv[])
+{
+	struct timeval tv;
+	int rv;
+
+	tv.tv_sec = 1;
+	tv.tv_usec = 1;
+	rv = select(0, NULL, NULL, NULL, &tv);
+	return (rv == -1 && errno != EINTR);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for glob()...
+# C: HAVE_GLOB
+cat << EOT >conftest19758.c
+#include <string.h>
+#include <glob.h>
+#include <stdio.h>
+
+int
+main(int argc, char *argv[])
+{
+	glob_t gl;
+	int rv, i;
+	char *s = NULL;
+
+	rv = glob("~/foo", GLOB_TILDE, NULL, &gl);
+	for (i = 0; i < gl.gl_pathc; i++) { s = gl.gl_pathv[i]; }
+	return (rv != 0 && s != NULL);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+conftest19758.c:12:21: error: use of undeclared identifier 'GLOB_TILDE'
+        rv = glob("~/foo", GLOB_TILDE, NULL, &gl);
+                           ^
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall conftest19758.c -c -o /tmp/emscripten_temp_d38au38c/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for the getopt() function...
+# C: HAVE_GETOPT
+cat << EOT >conftest19758.c
+#include <string.h>
+#include <getopt.h>
+
+int
+main(int argc, char *argv[])
+{
+	int c, x = 0;
+	while ((c = getopt(argc, argv, "foo")) != -1) {
+		extern char *optarg;
+		extern int optind, opterr, optopt;
+		if (optarg != NULL) { x = 1; }
+		if (optind > 0) { x = 2; }
+		if (opterr > 0) { x = 3; }
+		if (optopt > 0) { x = 4; }
+	}
+	return (x != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for the execvp() function...
+# C: HAVE_EXECVP
+cat << EOT >conftest19758.c
+#include <unistd.h>
+
+int
+main(int argc, char *argv[])
+{
+	char *args[3] = { "foo", NULL, NULL };
+	int rv;
+
+	rv = execvp(args[0], args);
+	return (rv);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for clock_gettime() interface (w/o -lrt)...
+# C: HAVE_CLOCK_GETTIME
+cat << EOT >conftest19758.c
+#include <time.h>
+int
+main(int argc, char *argv[])
+{
+	struct timespec ts;
+	clock_gettime(CLOCK_REALTIME, &ts);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# checking for winmm time interface...
+# C: HAVE_CLOCK_WIN32
+cat << EOT >conftest19758.c
+#ifdef _XBOX
+#include <xtl.h>
+#else
+#include <windows.h>
+#include <mmsystem.h>
+#endif
+
+int
+main(int argc, char *argv[])
+{
+	DWORD t0;
+#ifndef _XBOX
+	timeBeginPeriod(1);
+#endif
+	t0 = timeGetTime();
+	Sleep(1);
+	return (t0 != 0) ? 0 : 1;
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c -lwinmm 2>>config.log
+conftest19758.c:4:10: fatal error: 'windows.h' file not found
+#include <windows.h>
+         ^~~~~~~~~~~
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall conftest19758.c -c -o /tmp/emscripten_temp_xdv4u0hc/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for nanosleep()...
+# C: HAVE_NANOSLEEP
+cat << EOT >conftest19758.c
+#include <time.h>
+
+int
+main(int argc, char *argv[])
+{
+	struct timespec rqtp, rmtp;
+	int rv;
+
+	rqtp.tv_sec = 1;
+	rqtp.tv_nsec = 1000000;
+	rv = nanosleep(&rqtp, &rmtp);
+	return (rv == -1);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for the kqueue() mechanism...
+# C: HAVE_KQUEUE
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int
+main(int argc, char *argv[])
+{
+	struct kevent kev, chg;
+	int kq, fd = -1, nev;
+
+	if ((kq = kqueue()) == -1) { return (1); }
+#if defined(__NetBSD__)
+	EV_SET(&kev, (uintptr_t)fd, EVFILT_READ, EV_ADD|EV_ENABLE|EV_ONESHOT, 0, 0, (intptr_t)NULL);
+	EV_SET(&kev, (uintptr_t)1, EVFILT_TIMER, EV_ADD|EV_ENABLE, 0, 0, (intptr_t)NULL);
+#else
+	EV_SET(&kev, fd, EVFILT_READ, EV_ADD|EV_ENABLE|EV_ONESHOT, 0, 0, NULL);
+	EV_SET(&kev, 1, EVFILT_TIMER, EV_ADD|EV_ENABLE, 0, 0, NULL);
+#endif
+	nev = kevent(kq, &kev, 1, &chg, 1, NULL);
+	return (chg.flags & EV_ERROR);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+conftest19758.c:2:10: fatal error: 'sys/event.h' file not found
+#include <sys/event.h>
+         ^~~~~~~~~~~~~
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall conftest19758.c -c -o /tmp/emscripten_temp_0mglegsb/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for the Linux timerfd interface...
+# C: HAVE_TIMERFD
+cat << EOT >conftest19758.c
+#include <sys/timerfd.h>
+
+int
+main(int argc, char *argv[])
+{
+	struct itimerspec its;
+	int fd;
+
+	if ((fd = timerfd_create(CLOCK_MONOTONIC, TFD_TIMER_ABSTIME)) != -1) {
+		its.it_interval.tv_sec = 0;
+		its.it_interval.tv_nsec = 0L;
+		its.it_value.tv_sec = 0;
+		its.it_value.tv_nsec = 0L;
+		return (timerfd_settime(fd, 0, &its, NULL) == -1);
+	}
+	return (1);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+error: undefined symbol: timerfd_create (referenced by top-level compiled C/C++ code)
+warning: Link with `-s LLD_REPORT_UNDEFINED` to get more information on undefined symbols
+warning: To disable errors for undefined symbols use `-s ERROR_ON_UNDEFINED_SYMBOLS=0`
+warning: _timerfd_create may need to be added to EXPORTED_FUNCTIONS if it arrives from a system library
+error: undefined symbol: timerfd_settime (referenced by top-level compiled C/C++ code)
+warning: _timerfd_settime may need to be added to EXPORTED_FUNCTIONS if it arrives from a system library
+Error: Aborting compilation due to previous errors
+emcc: error: '/home/elchaschab/emsdk/node/14.15.5_64bit/bin/node /home/elchaschab/emsdk/upstream/emscripten/src/compiler.js /tmp/tmp4wc637bl.txt' failed (returned 1)
+# failed 0
+# no
+# checking for Windows CSIDL...
+# C: HAVE_CSIDL
+cat << EOT >conftest19758.c
+#include <shlobj.h>
+
+int
+main(int argc, char *argv[])
+{
+	WCHAR path[MAX_PATH];
+
+	if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, path))) {
+		return (0);
+	} else {
+		return (1);
+	}
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+conftest19758.c:1:10: fatal error: 'shlobj.h' file not found
+#include <shlobj.h>
+         ^~~~~~~~~~
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall conftest19758.c -c -o /tmp/emscripten_temp_rtntt0up/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for the Xbox XDK...
+# C: HAVE_XBOX
+cat << EOT >conftest19758.c
+#include <xtl.h>
+#ifndef _XBOX
+# error undefined
+#endif
+int
+main(int argc, char *argv[])
+{
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+conftest19758.c:1:10: fatal error: 'xtl.h' file not found
+#include <xtl.h>
+         ^~~~~~~
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -Wall conftest19758.c -c -o /tmp/emscripten_temp_46wsxs2h/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for SDL 1.2...# yes (1.3.0)
+# checking whether SDL works...
+# C: HAVE_SDL
+cat << EOT >conftest19758.c
+#ifdef _USE_SDL_FRAMEWORK
+# include <SDL/SDL.h>
+# ifdef main
+#  undef main
+# endif
+#else
+# include <SDL.h>
+#endif
+int main(int argc, char *argv[]) {
+	SDL_Surface *su;
+
+	if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_NOPARACHUTE) != 0) {
+		return (1);
+	}
+	su = SDL_CreateRGBSurface(0, 16, 16, 32, 0, 0, 0, 0);
+	SDL_FreeSurface(su);
+	SDL_Quit();
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# not enabling OpenGL
+# not enabling the X window system
+# not enabling the Xinerama extension
+# checking for the Cocoa framework...
+# ObjC: HAVE_COCOA
+cat << EOT >conftest19758.m
+#import <Cocoa/Cocoa.h>
+
+int main(int argc, char *argv[]) { return (0); }
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -DTARGET_API_MAC_CARBON -DTARGET_API_MAC_OSX -force_cpusubtype_ALL -fpascal-strings -x objective-c -o ./conftest19758 conftest19758.m -lobjc -Wl,-framework,Cocoa -Wl,-framework,OpenGL -Wl,-framework,IOKit 2>>config.log
+conftest19758.m:1:9: fatal error: 'Cocoa/Cocoa.h' file not found
+#import <Cocoa/Cocoa.h>
+        ^~~~~~~~~~~~~~~
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -DTARGET_API_MAC_CARBON -DTARGET_API_MAC_OSX -force_cpusubtype_ALL -fpascal-strings -x objective-c conftest19758.m -c -o /tmp/emscripten_temp_4qil_c9d/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# not enabling the Cocoa framework
+# not enabling the GLX interface
+# not enabling the WGL interface
+# checking for FreeType...# yes (24.0.18)
+# checking whether FreeType works...
+# C: HAVE_FREETYPE
+cat << EOT >conftest19758.c
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_OUTLINE_H
+int
+main(int argc, char *argv[])
+{
+	FT_Library library;
+	FT_Face face;
+	FT_Init_FreeType(&library);
+	FT_New_Face(library, "foo", 0, &face);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall  -o ./conftest19758 conftest19758.c -lfreetype  2>>config.log
+# yes
+# checking for fontconfig...# no
+# not enabling libjpeg
+# checking for libpng...# yes (1.6)
+# checking whether libpng works...
+# C: HAVE_PNG
+cat << EOT >conftest19758.c
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall  -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# checking for getaddrinfo()...
+# C: HAVE_GETADDRINFO
+cat << EOT >conftest19758.c
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int
+main(int argc, char *argv[])
+{
+	struct addrinfo hints, *res0;
+	const char *s;
+	int rv;
+
+	hints.ai_family = PF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+	rv = getaddrinfo("hostname", "port", &hints, &res0);
+	s = gai_strerror(rv);
+	freeaddrinfo(res0);
+	return (s != NULL);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for the SIOCGIFCONF interface...
+# C: HAVE_SIOCGIFCONF
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <net/if.h>
+#include <netdb.h>
+int
+main(int argc, char *argv[])
+{
+	char buf[4096];
+	struct ifconf conf;
+	struct ifreq *ifr;
+	int sock;
+	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+		return (1);
+	}
+	conf.ifc_len = sizeof(buf);
+	conf.ifc_buf = (caddr_t)buf;
+	if (ioctl(sock, SIOCGIFCONF, &conf) < 0) {
+		return (1);
+	}
+#if !defined(_SIZEOF_ADDR_IFREQ)
+#define _SIZEOF_ADDR_IFREQ sizeof
+#endif
+	for (ifr = (struct ifreq *)buf;
+	     (char *)ifr < &buf[conf.ifc_len];
+	     ifr = (struct ifreq *)((char *)ifr + _SIZEOF_ADDR_IFREQ(*ifr))) {
+		if (ifr->ifr_addr.sa_family == AF_INET)
+			return (1);
+	}
+	close(sock);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for setsockopt()...
+# C: HAVE_SETSOCKOPT
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <fcntl.h>
+int
+main(int argc, char *argv[])
+{
+	int fd = 0, rv;
+	struct timeval tv;
+	socklen_t tvLen = sizeof(tv);
+	tv.tv_sec = 1; tv.tv_usec = 0;
+	rv = setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, tvLen);
+	return (rv != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for SO_OOBINLINE...
+# C: HAVE_SO_OOBINLINE
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+int
+main(int argc, char *argv[])
+{
+	int fd = 0, val = 1, rv;
+	socklen_t valLen = sizeof(val);
+	rv = setsockopt(fd, SOL_SOCKET, SO_OOBINLINE, &val, valLen);
+	return (rv != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for SO_REUSEPORT...
+# C: HAVE_SO_REUSEPORT
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+int
+main(int argc, char *argv[])
+{
+	int fd = 0, val = 1, rv;
+	socklen_t valLen = sizeof(val);
+	rv = setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &val, valLen);
+	return (rv != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for SO_TIMESTAMP...
+# C: HAVE_SO_TIMESTAMP
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+int
+main(int argc, char *argv[])
+{
+	int fd = 0, val = 1, rv;
+	socklen_t valLen = sizeof(val);
+	rv = setsockopt(fd, SOL_SOCKET, SO_TIMESTAMP, &val, valLen);
+	return (rv != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for SO_NOSIGPIPE...
+# C: HAVE_SO_NOSIGPIPE
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+int
+main(int argc, char *argv[])
+{
+	int fd = 0, val = 1, rv;
+	socklen_t valLen = sizeof(val);
+	rv = setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &val, valLen);
+	return (rv != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+conftest19758.c:9:34: error: use of undeclared identifier 'SO_NOSIGPIPE'
+        rv = setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &val, valLen);
+                                        ^
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall conftest19758.c -c -o /tmp/emscripten_temp_i429s8c_/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for SO_LINGER...
+# C: HAVE_SO_LINGER
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+int
+main(int argc, char *argv[])
+{
+	int fd = 0, rv;
+	struct linger ling;
+	socklen_t lingLen = sizeof(ling);
+	ling.l_onoff = 1; ling.l_linger = 1;
+	rv = setsockopt(fd, SOL_SOCKET, SO_LINGER, &ling, lingLen);
+	return (rv != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+# yes
+# checking for SO_ACCEPTFILTER...
+# C: HAVE_SO_ACCEPTFILTER
+cat << EOT >conftest19758.c
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+int
+main(int argc, char *argv[])
+{
+	int fd = 0, rv;
+	struct accept_filter_arg afa;
+	socklen_t afaLen = sizeof(afa);
+	afa.af_name[0] = '\0';
+	afa.af_arg[0] = '\0';
+	rv = setsockopt(fd, SOL_SOCKET, SO_ACCEPTFILTER, &afa, afaLen);
+	return (rv != 0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -o ./conftest19758 conftest19758.c 2>>config.log
+conftest19758.c:8:27: error: variable has incomplete type 'struct accept_filter_arg'
+        struct accept_filter_arg afa;
+                                 ^
+conftest19758.c:8:9: note: forward declaration of 'struct accept_filter_arg'
+        struct accept_filter_arg afa;
+               ^
+conftest19758.c:12:34: error: use of undeclared identifier 'SO_ACCEPTFILTER'
+        rv = setsockopt(fd, SOL_SOCKET, SO_ACCEPTFILTER, &afa, afaLen);
+                                        ^
+2 errors generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall conftest19758.c -c -o /tmp/emscripten_temp_1gaiva20/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for WinSock...# not checking
+# not enabling zlib
+# not enabling Berkeley DB 4.x
+# not enabling Berkeley DB 5.x
+# not enabling MySQL
+# checking for POSIX threads...
+# C: HAVE_PTHREADS
+cat << EOT >conftest19758.c
+#include <pthread.h>
+#include <signal.h>
+
+static void *start_routine(void *arg)
+{
+	return (NULL);
+}
+int main(int argc, char *argv[])
+{
+	pthread_mutex_t mutex;
+	pthread_t thread;
+	pthread_mutex_init(&mutex, NULL);
+	pthread_mutex_lock(&mutex);
+	pthread_mutex_unlock(&mutex);
+	pthread_mutex_destroy(&mutex);
+	pthread_create(&thread, NULL, start_routine, NULL);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall  -o ./conftest19758 conftest19758.c -lpthread 2>>config.log
+# yes
+# checking for the X/Open Threads Extension...
+# C: HAVE_PTHREADS_XOPEN
+cat << EOT >conftest19758.c
+#include <pthread.h>
+#include <signal.h>
+
+int main(int argc, char *argv[])
+{
+	pthread_mutex_t mutex;
+	pthread_mutexattr_t mutexattr;
+	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
+	pthread_mutex_init(&mutex, &mutexattr);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -Wall -U_XOPEN_SOURCE -D_XOPEN_SOURCE=600 -o ./conftest19758 conftest19758.c -lpthread 2>>config.log
+# yes
+# checking for PTHREAD_MUTEX_RECURSIVE...
+# C: HAVE_PTHREAD_MUTEX_RECURSIVE
+cat << EOT >conftest19758.c
+#include <pthread.h>
+#include <signal.h>
+int main(int argc, char *argv[])
+{
+	pthread_mutex_t mutex;
+	pthread_mutexattr_t mutexattr;
+	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
+	pthread_mutex_init(&mutex, &mutexattr);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -Wall  -o ./conftest19758 conftest19758.c -lpthread 2>>config.log
+# yes
+# checking for PTHREAD_MUTEX_RECURSIVE_NP...
+# C: HAVE_PTHREAD_MUTEX_RECURSIVE_NP
+cat << EOT >conftest19758.c
+#include <pthread.h>
+#include <signal.h>
+int main(int argc, char *argv[])
+{
+	pthread_mutex_t mutex;
+	pthread_mutexattr_t mutexattr;
+	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE_NP);
+	pthread_mutex_init(&mutex, &mutexattr);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -Wall  -o ./conftest19758 conftest19758.c -lpthread 2>>config.log
+conftest19758.c:7:40: error: use of undeclared identifier 'PTHREAD_MUTEX_RECURSIVE_NP'
+        pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE_NP);
+                                              ^
+1 error generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall conftest19758.c -c -o /tmp/emscripten_temp_crjmuatz/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking whether pthread_mutex_t is a pointer...
+# C: HAVE_PTHREAD_MUTEX_T_POINTER
+cat << EOT >conftest19758.c
+#include <pthread.h>
+
+int main(int argc, char *argv[])
+{
+	pthread_mutex_t mutex = NULL;
+	pthread_mutex_init(&mutex, NULL);
+	return (mutex != NULL);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -Wall  -o ./conftest19758 conftest19758.c -lpthread 2>>config.log
+conftest19758.c:5:18: error: initializing 'pthread_mutex_t' with an expression of incompatible type 'void *'
+        pthread_mutex_t mutex = NULL;
+                        ^       ~~~~
+conftest19758.c:7:16: error: invalid operands to binary expression ('pthread_mutex_t' and 'void *')
+        return (mutex != NULL);
+                ~~~~~ ^  ~~~~
+2 errors generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall conftest19758.c -c -o /tmp/emscripten_temp_vvjhvll2/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking whether pthread_cond_t is a pointer...
+# C: HAVE_PTHREAD_COND_T_POINTER
+cat << EOT >conftest19758.c
+#include <pthread.h>
+
+int main(int argc, char *argv[])
+{
+	pthread_cond_t cond = NULL;
+	pthread_cond_init(&cond, NULL);
+	return (cond != NULL);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -Wall  -o ./conftest19758 conftest19758.c -lpthread 2>>config.log
+conftest19758.c:5:17: error: initializing 'pthread_cond_t' with an expression of incompatible type 'void *'
+        pthread_cond_t cond = NULL;
+                       ^      ~~~~
+conftest19758.c:7:15: error: invalid operands to binary expression ('pthread_cond_t' and 'void *')
+        return (cond != NULL);
+                ~~~~ ^  ~~~~
+2 errors generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall conftest19758.c -c -o /tmp/emscripten_temp_11gda3it/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking whether pthread_t is a pointer...
+# C: HAVE_PTHREAD_T_POINTER
+cat << EOT >conftest19758.c
+#include <pthread.h>
+static void *start_routine(void *arg) { return (NULL); }
+int main(int argc, char *argv[])
+{
+	pthread_t th = NULL;
+	return pthread_create(&th, NULL, start_routine, NULL);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -Wall  -o ./conftest19758 conftest19758.c -lpthread 2>>config.log
+# yes
+# not enabling iconv()
+# not enabling a gettext library in libc
+# checking for AltiVec (with <altivec.h>)...
+# C: HAVE_ALTIVEC
+cat << EOT >conftest19758.c
+#include <altivec.h>
+float a[4] = { 1,2,3,4 };
+float b[4] = { 5,6,7,8 };
+float c[4];
+
+int
+main(int argc, char *argv[])
+{
+	vector float *va = (vector float *)a;
+	vector float *vb = (vector float *)b;
+	vector float *vc = (vector float *)c;
+
+	*vc = vec_add(*va, *vb);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -Wall -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -mabi=altivec -maltivec -o ./conftest19758 conftest19758.c  2>>config.log
+clang-14: warning: argument unused during compilation: '-maltivec' [-Wunused-command-line-argument]
+In file included from conftest19758.c:1:
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:13:2: error: "AltiVec support not enabled"
+#error "AltiVec support not enabled"
+ ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:46:19: error: unknown type name 'vector'
+static __inline__ vector signed char __ATTRS_o_ai vec_perm(
+                  ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:47:5: error: unknown type name 'vector'
+    vector signed char __a, vector signed char __b, vector unsigned char __c);
+    ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:47:29: error: unknown type name 'vector'
+    vector signed char __a, vector signed char __b, vector unsigned char __c);
+                            ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:47:53: error: unknown type name 'vector'
+    vector signed char __a, vector signed char __b, vector unsigned char __c);
+                                                    ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:49:19: error: unknown type name 'vector'
+static __inline__ vector unsigned char __ATTRS_o_ai
+                  ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:50:10: error: unknown type name 'vector'
+vec_perm(vector unsigned char __a, vector unsigned char __b,
+         ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:50:36: error: unknown type name 'vector'
+vec_perm(vector unsigned char __a, vector unsigned char __b,
+                                   ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:51:10: error: unknown type name 'vector'
+         vector unsigned char __c);
+         ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:53:19: error: unknown type name 'vector'
+static __inline__ vector bool char __ATTRS_o_ai
+                  ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:53:8: error: 'inline' can only appear on functions
+static __inline__ vector bool char __ATTRS_o_ai
+       ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:53:30: error: expected ';' after top level declarator
+static __inline__ vector bool char __ATTRS_o_ai
+                             ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:54:10: error: unknown type name 'vector'
+vec_perm(vector bool char __a, vector bool char __b, vector unsigned char __c);
+         ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:54:22: error: expected ')'
+vec_perm(vector bool char __a, vector bool char __b, vector unsigned char __c);
+                     ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:54:9: note: to match this '('
+vec_perm(vector bool char __a, vector bool char __b, vector unsigned char __c);
+        ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:56:19: error: unknown type name 'vector'
+static __inline__ vector short __ATTRS_o_ai vec_perm(vector signed short __a,
+                  ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:56:54: error: unknown type name 'vector'
+static __inline__ vector short __ATTRS_o_ai vec_perm(vector signed short __a,
+                                                     ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:57:54: error: unknown type name 'vector'
+                                                     vector signed short __b,
+                                                     ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:58:54: error: unknown type name 'vector'
+                                                     vector unsigned char __c);
+                                                     ^
+/home/elchaschab/emsdk/upstream/lib/clang/14.0.0/include/altivec.h:60:19: error: unknown type name 'vector'
+static __inline__ vector unsigned short __ATTRS_o_ai
+                  ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -mabi=altivec -maltivec conftest19758.c -c -o /tmp/emscripten_temp_lfi2gtqt/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# checking for AltiVec (without <altivec.h>)...
+# C: HAVE_ALTIVEC
+cat << EOT >conftest19758.c
+float a[4] = { 1,2,3,4 };
+float b[4] = { 5,6,7,8 };
+float c[4];
+
+int
+main(int argc, char *argv[])
+{
+	vector float *va = (vector float *)a;
+	vector float *vb = (vector float *)b;
+	vector float *vc = (vector float *)c;
+
+	*vc = vec_add(*va, *vb);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -Wall -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -mabi=altivec -maltivec -o ./conftest19758 conftest19758.c  2>>config.log
+clang-14: warning: argument unused during compilation: '-maltivec' [-Wunused-command-line-argument]
+conftest19758.c:8:2: error: use of undeclared identifier 'vector'
+        vector float *va = (vector float *)a;
+        ^
+conftest19758.c:9:2: error: use of undeclared identifier 'vector'
+        vector float *vb = (vector float *)b;
+        ^
+conftest19758.c:10:2: error: use of undeclared identifier 'vector'
+        vector float *vc = (vector float *)c;
+        ^
+conftest19758.c:12:8: error: implicit declaration of function 'vec_add' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+        *vc = vec_add(*va, *vb);
+              ^
+conftest19758.c:12:3: error: use of undeclared identifier 'vc'
+        *vc = vec_add(*va, *vb);
+         ^
+conftest19758.c:12:17: error: use of undeclared identifier 'va'
+        *vc = vec_add(*va, *vb);
+                       ^
+conftest19758.c:12:22: error: use of undeclared identifier 'vb'
+        *vc = vec_add(*va, *vb);
+                            ^
+7 errors generated.
+emcc: error: '/home/elchaschab/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -DEMSCRIPTEN -fignore-exceptions -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D__EMSCRIPTEN_major__=2 -D__EMSCRIPTEN_minor__=0 -D__EMSCRIPTEN_tiny__=31 -D_LIBCPP_ABI_VERSION=2 -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL -I/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot/include/freetype2/freetype --sysroot=/home/elchaschab/emsdk/upstream/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -Wall -msimd128 -DNDEBUG -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE -mabi=altivec -maltivec conftest19758.c -c -o /tmp/emscripten_temp_zl2ded4z/conftest19758_0.o' failed (returned 1)
+# failed 0
+# no
+# not enabling AltiVec (with <altivec.h>)
+# checking for SSE extensions...
+# C: HAVE_SSE
+cat << EOT >conftest19758.c
+#include <xmmintrin.h>
+#include <stdio.h>
+
+#define MAXERR 1e-4
+
+typedef union vec {
+	float v[4];
+	__m128 m128;
+	struct { float x, y, z, pad; };
+} MyVector __attribute__ ((aligned(16)));
+
+int
+main(int argc, char *argv[])
+{
+	MyVector a;
+	__m128 v;
+
+	a.x = 1.0f;
+	a.y = 2.0f;
+	a.z = 3.0f;
+	v = _mm_set1_ps(1.0f);
+	a.m128 = _mm_mul_ps(a.m128, v);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -Wall -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -msse -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# checking for SSE2 extensions...
+# C: HAVE_SSE2
+cat << EOT >conftest19758.c
+#include <emmintrin.h>
+
+int
+main(int argc, char *argv[])
+{
+	double a[4] __attribute__ ((aligned(16)));
+	double b[4] __attribute__ ((aligned(16)));
+	double rv;
+	__m128d vec1, vec2;
+	a[0] = 1.0f; a[1] = 2.0f; a[2] = 3.0f; a[3] = 4.0f;
+	b[0] = 1.0f; b[1] = 2.0f; b[2] = 3.0f; b[3] = 4.0f;
+	vec1 = _mm_load_pd(a);
+	vec2 = _mm_load_pd(b);
+	vec1 = _mm_xor_pd(vec1, vec2);
+	_mm_store_sd(&rv, vec1);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -Wall -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -msse2 -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# checking for SSE3 extensions...
+# C: HAVE_SSE3
+cat << EOT >conftest19758.c
+#include <pmmintrin.h>
+
+int
+main(int argc, char *argv[])
+{
+	float a[4] __attribute__ ((aligned(16)));
+	float b[4] __attribute__ ((aligned(16)));
+	__m128 vec1, vec2;
+	float rv;
+	a[0] = 1.0f; a[1] = 2.0f; a[2] = 3.0f; a[3] = 4.0f;
+	b[0] = 1.0f; b[1] = 2.0f; b[2] = 3.0f; b[3] = 4.0f;
+	vec1 = _mm_load_ps(a);
+	vec2 = _mm_load_ps(b);
+	vec1 = _mm_mul_ps(vec1, vec2);
+	vec1 = _mm_hadd_ps(vec1, vec1);
+	vec1 = _mm_hadd_ps(vec1, vec1);
+	_mm_store_ss(&rv, vec1);
+	return (0);
+}
+EOT
+/home/elchaschab/emsdk/upstream/emscripten/emcc -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -Wall -msimd128 -DNDEBUG -g0 -O3 -ffp-contract=fast -freciprocal-math -fno-signed-zeros --closure 1 -s USE_FREETYPE=1 -s USE_LIBPNG=1 -D_AGAR_INTERNAL -D_DEFAULT_SOURCE -D_BSD_SOURCE  -msse3 -o ./conftest19758 conftest19758.c  2>>config.log
+# yes
+# not enabling libsndfile
+# not enabling PortAudio2
+# not enabling GLU

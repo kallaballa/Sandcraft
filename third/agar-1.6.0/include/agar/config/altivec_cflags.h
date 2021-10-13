@@ -1,0 +1,1 @@
+#undef ALTIVEC_CFLAGS

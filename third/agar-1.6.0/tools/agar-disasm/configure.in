@@ -1,0 +1,18 @@
+# Public domain
+# ex:syn=bsdbuild
+
+config_guess("../../mk/config.guess")
+
+require(cc)
+check(getopt)
+check(pthreads)
+check(sdl)
+check(opengl)
+check(freetype)
+require(agar, 1.4.1)
+
+c_define(_USE_AGAR_QUEUE)
+c_define(_USE_AGAR_STD)
+c_incdir($SRC)
+c_no_secure_warnings()
+

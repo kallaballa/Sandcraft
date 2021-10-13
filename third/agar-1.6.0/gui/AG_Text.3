@@ -1,0 +1,511 @@
+.\" Copyright (c) 2002-2020 Julien Nadeau Carriere <vedge@csoft.net>
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 
+.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+.\" INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+.\" (INCLUDING BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+.\" SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+.\" STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+.\" IN ANY WAY OUT OF THE USE OF THIS SOFTWARE EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.\"
+.Dd April 24, 2003
+.Dt AG_TEXT 3
+.Os
+.ds vT Agar API Reference
+.ds oS Agar 1.0
+.Sh NAME
+.Nm AG_Text
+.Nd agar text rendering interface
+.Sh SYNOPSIS
+.Bd -literal
+#include <agar/core.h>
+#include <agar/gui.h>
+.Ed
+.Sh DESCRIPTION
+.\" IMAGE(http://libagar.org/widgets/AG_Textbox.png, "The AG_Textbox(3) widget")
+The
+.Nm
+interface allows Agar GUI widgets to render text using a vector or a bitmap engine.
+FreeType is used by default if it is available.
+.Sh RENDERING ATTRIBUTES
+Agar maintains a stack of rendering attributes which influence the operation
+of text rendering and sizing routines.
+Attributes are set using functions such as
+.Fn AG_TextFont
+or
+.Fn AG_TextColor .
+.Pp
+Note: The functions below are *not* free-threaded and are only safe to invoke
+from the
+.Fn draw ,
+.Fn size_request ,
+.Fn size_allocate ,
+or any event handler of an
+.Xr AG_Widget 3
+with the
+.Dv AG_WIDGET_USE_TEXT
+flag set.
+.Pp
+.nr nS 1
+.Ft void
+.Fn AG_PushTextState "void"
+.Pp
+.Ft void
+.Fn AG_CopyTextState "AG_TextState *dst"
+.Pp
+.Ft void
+.Fn AG_PopTextState "void"
+.Pp
+.Ft "AG_TextState *"
+.Fn AG_TEXT_STATE_CUR "void"
+.Pp
+.Ft void
+.Fn AG_TextFont "AG_Font *font"
+.Pp
+.Ft "AG_Font *"
+.Fn AG_TextFontLookup "const char *face" "float points" "Uint flags"
+.Pp
+.Ft "AG_Font *"
+.Fn AG_TextFontPct "int size_pct"
+.Pp
+.Ft "AG_Font *"
+.Fn AG_TextFontPctFlags "int size_pct" "Uint flags"
+.Pp
+.Ft "AG_Font *"
+.Fn AG_TextFontPts "float size"
+.Pp
+.Ft void
+.Fn AG_TextJustify "enum ag_text_justify mode"
+.Pp
+.Ft void
+.Fn AG_TextValign "enum ag_text_valign mode"
+.Pp
+.Ft void
+.Fn AG_TextTabWidth "int pixels"
+.Pp
+.Ft void
+.Fn AG_TextColor "const AG_Color *c"
+.Pp
+.Ft void
+.Fn AG_TextColorRGB "Uint8 r" "Uint8 g" "Uint8 b"
+.Pp
+.Ft void
+.Fn AG_TextColorRGBA "Uint8 r" "Uint8 g" "Uint8 b" "Uint8 a"
+.Pp
+.Ft void
+.Fn AG_TextBGColor "const AG_Color *c"
+.Pp
+.Ft void
+.Fn AG_TextBGColorRGB "Uint8 r" "Uint8 g" "Uint8 b"
+.Pp
+.Ft void
+.Fn AG_TextBGColorRGBA "Uint8 r" "Uint8 g" "Uint8 b" "Uint8 a"
+.Pp
+.Ft void
+.Fn AG_TextBGColorRGBA "Uint8 r" "Uint8 g" "Uint8 b" "Uint8 a"
+.Pp
+.Ft void
+.Fn AG_TextColorANSI "enum ag_ansi_color which" "const AG_Color *c"
+.Pp
+.nr nS 0
+.Fn AG_PushTextState
+increments the attribute stack pointer and creates a copy of the previous
+state in the current state.
+.Fn AG_PopTextState
+decrements the stack pointer, discarding the current state.
+.Fn AG_CopyTextState
+copies the current text state to
+.Fa dst .
+The text state stack can hold up to
+.Dv AG_TEXT_STATES_MAX
+elements.
+.Pp
+The
+.Fn AG_TEXT_STATE_CUR
+macro expands to an expression returning the pointer to the current
+.Ft AG_TextState .
+In debug mode, an additional validity test is performed.
+.Pp
+The
+.Fn AG_TextFont
+function selects
+.Fa font
+as the active font.
+.Pp
+.Fn AG_TextFontLookup
+checks the font cache for a given combination of face, point size and flags,
+possibly loading new fonts from disk.
+On success, the font is set as the active font for the current text state
+and a pointer to it is returned.
+If no font was found,
+.Fn AG_TextFontLookup
+returns NULL.
+.Pp
+.Fn AG_TextFontPts
+sets the size of the active font in points.
+If the argument nears 0.0 (is smaller than
+.Dv AG_FONT_PTS_EPSILON )
+then the
+.Xr AG_Config 3
+default "font.size" is used.
+.Pp
+.Fn AG_TextFontPct
+sets the size of the active font, specified as percentage of current font size.
+An argument of 100% leaves the size unchanged.
+.Fn AG_TextFontPctFlags
+allows an alternate font style via
+.Fa flags
+argument.
+.Pp
+.Fn AG_TextJustify
+selects the justify mode to use in multi-line rendering:
+.Bd -literal
+enum ag_text_justify {
+	AG_TEXT_LEFT,
+	AG_TEXT_CENTER,
+	AG_TEXT_RIGHT
+};
+.Ed
+.Pp
+.Fn AG_TextValign
+selects the vertical alignment mode to use where text is rendered to an
+area of arbitrary height:
+.Bd -literal
+enum ag_text_valign {
+	AG_TEXT_TOP,
+	AG_TEXT_MIDDLE,
+	AG_TEXT_BOTTOM
+};
+.Ed
+.Pp
+.Fn AG_TextTabWidth
+sets the width of tabs in pixels.
+.Pp
+.Fn AG_TextColor
+sets the text color (see
+.Xr AG_Color 3 ) .
+.Fn AG_TextColorRGB
+and
+.Fn AG_TextColorRGBA
+accept individual color components.
+.Pp
+Similarly,
+.Fn AG_TextBG*
+functions assign a background color for the surfaces returned by the
+rendering functions.
+.Pp
+.Fn AG_TextColorANSI
+modifies an entry in the 4-bit ANSI color palette.
+Subsequent calls to
+.Fn AG_TextRender
+will display text containing
+.Dv AG_SGR_FG*
+or
+.Dv AG_SGR_BG*
+sequences in the specified color (until
+.Fn AG_PopTextState
+is called).
+When the ANSI color palette is first modified, it is copied to the active
+.Ft AG_TextState
+in a copy-on-write fashion.
+.Sh RENDERING
+.nr nS 1
+.Ft "AG_Surface *"
+.Fn AG_TextRender "const char *text"
+.Pp
+.Ft "AG_Surface *"
+.Fn AG_TextRenderF "const char *fmt" "..."
+.Pp
+.Ft "AG_Surface *"
+.Fn AG_TextRenderInternal "const AG_Char *text" "const AG_Font *font" "const AG_Color *cBg" "const AG_Color *cFg"
+.Pp
+.Ft "AG_Glyph *"
+.Fn AG_TextRenderGlyph "AG_Driver *drv" "const AG_Font *font" "const AG_Color *cBg" "const AG_Color *cFg" "AG_Char ch"
+.Pp
+.Ft "void"
+.Fn AG_TextSize "const char *text" "int *w" "int *h"
+.Pp
+.Ft "void"
+.Fn AG_TextSizeInternal "const AG_Char *text" "int *w" "int *h"
+.Pp
+.Ft "void"
+.Fn AG_TextSizeMulti "const char *text" "int *w" "int *h" "Uint **wLines" "Uint *nLines"
+.Pp
+.Ft "void"
+.Fn AG_TextSizeMultiInternal "const AG_Char *text" "int *w" "int *h" "Uint **wLines" "Uint *nLines"
+.Pp
+.nr nS 0
+.Fn AG_TextRender
+renders the C string
+.Fa text
+onto a newly-allocated surface.
+The font, colors and spacings are according to the current
+.Em Rendering Attributes .
+The input
+.Fa text
+may contain UTF-8 characters and ANSI SGR sequences.
+.Pp
+.Fn AG_TextRenderInternal
+renders onto a new surface text in native
+.Ft AG_Char
+encoding (which is either an ASCII
+.Ft char ,
+or a 32-bit UCS-4 character in Unicode builds).
+.Fn AG_TextRenderGlyph
+returns a pointer to the corresponding
+.Ft AG_Glyph
+from the cache, which has the following public (read-only) members:
+.Pp
+.Bl -tag -compact -width "float texcoord[4] "
+.It AG_Char ch
+Native character (UCS-4 or ASCII)
+.It AG_Surface *su
+Pixel surface
+.It Uint texture
+OpenGL texture handle (if OpenGL is in use)
+.It float texcoord[4]
+OpenGL texture coordinates (if OpenGL is in use
+.It int advance
+Amount of translation (in pixels) recommended to follow when rendering text
+.El
+.Pp
+The
+.Fn AG_TextSize
+and
+.Fn AG_TextSizeInternal
+functions return the minimal bounding box in pixels required for rendering the
+given text.
+The
+.Fn AG_TextSizeMulti
+and
+.Fn AG_TextSizeMultiInternal
+variants also return the number of lines into
+.Fa nLines
+and the width in pixels of each line in the array
+.Fa wLines
+(which must be initialized to NULL).
+.Sh CANNED DIALOGS
+.nr nS 1
+.Ft "void"
+.Fn AG_TextMsg "enum ag_text_msg_title title" "const char *format" "..."
+.Pp
+.Ft "void"
+.Fn AG_TextMsgS "enum ag_text_msg_title title" "const char *msg"
+.Pp
+.Ft "void"
+.Fn AG_TextMsgFromError "void"
+.Pp
+.Ft "void"
+.Fn AG_TextWarning "const char *disableKey" "const char *format" "..."
+.Pp
+.Ft "void"
+.Fn AG_TextWarningS "const char *disableKey" "const char *msg"
+.Pp
+.Ft "void"
+.Fn AG_TextError "const char *format" "..."
+.Pp
+.Ft "void"
+.Fn AG_TextErrorS "const char *msg"
+.Pp
+.Ft "void"
+.Fn AG_TextInfo "const char *disableKey" "const char *format" "..."
+.Pp
+.Ft "void"
+.Fn AG_TextInfoS "const char *disableKey" "const char *msg"
+.Pp
+.Ft "void"
+.Fn AG_TextTmsg "enum ag_text_msg_title title" "Uint32 expire" "const char *format" "..."
+.Pp
+.Ft "void"
+.Fn AG_TextTmsgS "enum ag_text_msg_title title" "Uint32 expire" "const char *msg"
+.Pp
+.nr nS 0
+The
+.Fn AG_TextMsg
+function displays a text message window containing the given
+.Xr printf 3
+formatted string, and an
+.Sq OK
+button.
+.Fa title
+is one of the following:
+.Bd -literal
+enum ag_text_msg_title {
+	AG_MSG_ERROR,
+	AG_MSG_WARNING,
+	AG_MSG_INFO
+};
+.Ed
+.Pp
+.Fn AG_TextMsgFromError
+displays a standard error message using the value of
+.Xr AG_GetError 3 .
+.Pp
+.Fn AG_TextWarning
+displays a standard warning message, but if
+.Fa disableKey
+is non-NULL, it also provides the user
+with a
+.Dq Don't show again
+checkbox.
+The checkbox controls the
+.Xr AG_Config 3
+value specified by
+.Fa disableKey .
+.Pp
+.Fn AG_TextError
+displays an error message.
+It is equivalent to
+.Fn AG_TextMsg
+with a
+.Dv AG_MSG_ERROR
+setting.
+.Pp
+.Fn AG_TextInfo
+displays an informational message.
+Similar to
+.Fn AG_TextWarning ,
+if
+.Fa disableKey
+is non-NULL then a
+.Dq Don't show again
+option is also provided to the user.
+.Pp
+The
+.Fn AG_TextTmsg
+routine is a variant of
+.Fn AG_TextMsg
+which displays the message for a specific amount of time, given in milliseconds.
+.\" MANLINK(AG_Font)
+.Sh FONT SELECTION
+.nr nS 1
+.Ft "AG_Font *"
+.Fn AG_FetchFont "const char *face" "float size" "Uint flags"
+.Pp
+.Ft void
+.Fn AG_UnusedFont "AG_Font *font"
+.Pp
+.Ft "AG_Font *"
+.Fn AG_SetDefaultFont "AG_Font *font"
+.Pp
+.Ft void
+.Fn AG_TextParseFontSpec "const char *fontspec"
+.Pp
+.nr nS 0
+.Fn AG_FetchFont
+loads (or retrieves from cache) the font corresponding to the specified
+.Fa face ,
+.Fa size
+and
+.Fa flags
+attributes.
+Face may refer to either a system-wide font or a file in
+.Va font-path .
+.Fa size
+is in points (fractional sizes are permitted).
+Possible
+.Fa flags
+include:
+.Bd -literal
+#define AG_FONT_BOLD           0x001    /* Bold style */
+#define AG_FONT_ITALIC         0x002    /* Italic style */
+#define AG_FONT_UNDERLINE      0x004    /* Generate underline */
+#define AG_FONT_UPPERCASE      0x008    /* Force uppercase */
+#define AG_FONT_OBLIQUE        0x010    /* Oblique style */
+#define AG_FONT_UPRIGHT_ITALIC 0x020    /* Upright italic style */
+#define AG_FONT_SEMICONDENSED  0x040    /* Semi-condensed */
+#define AG_FONT_CONDENSED      0x080    /* Condensed */
+#define AG_FONT_SW_BOLD        0x100    /* Software-generated bold */
+#define AG_FONT_SW_OBLIQUE     0x200    /* Software-generated oblique */
+#define AG_FONT_SW_ITALIC      AG_FONT_SW_OBLIQUE
+
+#define AG_FONT_WEIGHTS     (AG_FONT_BOLD | AG_FONT_SW_BOLD)
+#define AG_FONT_STYLES      (AG_FONT_ITALIC | AG_FONT_SW_ITALIC | \\
+                             AG_FONT_OBLIQUE | AG_FONT_UPRIGHT_ITALIC) 
+#define AG_FONT_WD_VARIANTS (AG_FONT_SEMICONDENSED | AG_FONT_CONDENSED)
+.Ed
+.Pp
+The font is loaded from file if not currently resident (unless the fontconfig
+library is available, the font file should reside in one of the directories
+specified in the
+.Va font-path
+setting).
+.Pp
+If the
+.Fa face
+or
+.Fa size
+arguments are NULL then
+.Fn AG_FetchFont
+uses the
+.Xr AG_Config 3
+defaults `font.face' and `font.size'.
+.Fn AG_FetchFont
+returns a pointer to the font object and increments its reference count.
+If the font cannot be loaded, it returns NULL.
+.Pp
+The
+.Fn AG_UnusedFont
+function decrements the reference count on a font.
+If the font is no longer referenced, it is destroyed.
+.Pp
+.Fn AG_SetDefaultFont
+sets the specified font object as the default font.
+A pointer to the previous default font is returned.
+.Pp
+.Fn AG_TextParseFontSpec
+parses a "<Face>[:<Size>][:<Style>]" format specification, loads the matching
+font and (if successful) sets it as the default font.
+Exceptionally, it is safe to invoke
+.Fn AG_TextParseFontSpec
+before the initial
+.Fn AG_InitGraphics
+call so that the default font can be set from a command-line argument.
+If
+.Fa fontspec
+is NULL then it's a no-op.
+.Pp
+Field separators "," and "/" are also recognized in addition to ":".
+Possible
+.Va Style
+flags include "b" = bold, "i" = italic, "I" = upright italic and "U" = uppercase.
+.Sh SEE ALSO
+.Xr AG_Config 3 ,
+.Xr AG_Editable 3 ,
+.Xr AG_Intro 3 ,
+.Xr AG_Label 3 ,
+.Xr AG_Surface 3 ,
+.Xr AG_Textbox 3 ,
+.Xr AG_TextElement 3 ,
+.Xr AG_Widget 3
+.Pp
+.Lk http://www.freetype.org/ FreeType
+.Pp
+.Lk http://www.unicode.org/ Unicode
+.Pp
+.Lk https://www.freedesktop.org/wiki/Software/fontconfig/ Fontconfig
+.Sh HISTORY
+The
+.Nm
+interface first appeared in Agar 1.0.
+Rendering attributes were introduced in Agar 1.3.
+Fontconfig support was added in Agar 1.5.
+Upright Italic and width variants were added in Agar 1.6.0.
+.Fn AG_CopyTextState
+and
+.Fn AG_TextFontPctFlags
+appeared in Agar 1.6.0.

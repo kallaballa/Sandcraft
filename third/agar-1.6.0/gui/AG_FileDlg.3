@@ -1,0 +1,513 @@
+.\" Copyright (c) 2006-2020 Julien Nadeau Carriere <vedge@csoft.net>
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 
+.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+.\" INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+.\" (INCLUDING BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+.\" SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+.\" STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+.\" IN ANY WAY OUT OF THE USE OF THIS SOFTWARE EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.\"
+.Dd October 5, 2006
+.Dt AG_FILEDLG 3
+.Os
+.ds vT Agar API Reference
+.ds oS Agar 1.1
+.Sh NAME
+.Nm AG_FileDlg
+.Nd agar file browser widget
+.Sh SYNOPSIS
+.Bd -literal
+#include <agar/core.h>
+#include <agar/gui.h>
+.Ed
+.Sh DESCRIPTION
+.\" IMAGE(http://libagar.org/widgets/AG_FileDlg.png, "The AG_FileDlg widget")
+.Nm
+is a traditional file selection widget.
+It displays a list of directories and shortcuts at the left, a list of files
+at the right and an input textbox and file type selector at the bottom.
+If supports filesystem monitoring via
+.Xr AG_AddEventSink 3 .
+On platforms with
+.Xr glob 3
+support, glob patterns may be entered in the input textbox.
+.Pp
+Although
+.Nm
+is most often used to implement "Load" or "Save as..." dialog windows, it
+may also be embedded into any arbitrary container widget.
+User-specified actions (with optional parameters) can be tied to specific
+file extensions.
+.Pp
+For selecting directories, the
+.Xr AG_DirDlg 3
+widget may be used instead.
+.Sh INHERITANCE HIERARCHY
+.Xr AG_Object 3 ->
+.Xr AG_Widget 3 ->
+.Nm .
+.Sh INTERFACE
+.nr nS 1
+.Ft "AG_FileDlg *"
+.Fn AG_FileDlgNew "AG_Widget *parent" "Uint flags"
+.Pp
+.Ft "AG_FileDlg *"
+.Fn AG_FileDlgNewMRU "AG_Widget *parent" "const char *mruKey" "Uint flags"
+.Pp
+.Ft "AG_FileDlg *"
+.Fn AG_FileDlgNewCompact "AG_Widget *parent" "const char *label" "Uint flags"
+.Pp
+.Ft "AG_FileDlg *"
+.Fn AG_FileDlgNewCompactMRU "AG_Widget *parent" "const char *label" "const char *mruKey" "Uint flags"
+.Pp
+.Ft "char *"
+.Fn AG_FileDlgGetDirectory "AG_FileDlg *fd"
+.Pp
+.Ft AG_Size
+.Fn AG_FileDlgCopyDirectory "AG_FileDlg *fd" "char *dst" "AG_Size size"
+.Pp
+.Ft int
+.Fn AG_FileDlgSetDirectory "AG_FileDlg *fd" "const char *format" "..."
+.Pp
+.Ft int
+.Fn AG_FileDlgSetDirectoryS "AG_FileDlg *fd" "const char *path"
+.Pp
+.Ft void
+.Fn AG_FileDlgSetDirectoryMRU "AG_FileDlg *fd" "const char *mruKey" "const char *defaultDir"
+.Pp
+.Ft "char *"
+.Fn AG_FileDlgGetFilename "AG_FileDlg *fd"
+.Pp
+.Ft AG_Size
+.Fn AG_FileDlgCopyFilename "AG_FileDlg *fd" "char *dst" "AG_Size size"
+.Pp
+.Ft void
+.Fn AG_FileDlgSetFilename "AG_FileDlg *fd" "const char *format" "..."
+.Pp
+.Ft void
+.Fn AG_FileDlgSetFilenameS "AG_FileDlg *fd" "const char *filename"
+.Pp
+.Ft "AG_FileType *"
+.Fn AG_FileDlgAddType "AG_FileDlg *fd" "const char *descr" "const char *exts" "void (*fn)(AG_Event *)" "const char *fnArgs" "..."
+.Pp
+.Ft "void"
+.Fn AG_FileDlgAddImageTypes "AG_FileDlg *fd" "void (*fn)(AG_Event *)" "const char *fnArgs" "..."
+.Pp
+.Ft "void"
+.Fn AG_FileDlgCopyTypes "AG_FileDlg *dst" "const AG_FileDlg *src"
+.Pp
+.Ft "void"
+.Fn AG_FileDlgRefresh "AG_FileDlg *fd"
+.Pp
+.nr nS 0
+.Fn AG_FileDlgNew
+allocates, initializes, and attaches a new
+.Nm .
+.Pp
+The
+.Fn AG_FileDlgNewMRU
+variant calls
+.Fn AG_FileDlgSetDirectoryMRU
+with
+.Fa mruKey .
+Unless
+.Fn AG_FileDlgSetDirectory
+is used (see below), the default directory is set according to the
+.Dv AG_CONFIG_PATH_DATA
+setting of
+.Xr AG_Config 3 .
+.Pp
+.Fn AG_FileDlgNewCompact
+and
+.Fn AG_FileDlgNewCompactMRU
+implicitely set the
+.Dv AG_FILEDLG_COMPACT
+flag as well as the contents of the display label.
+.Pp
+Acceptable
+.Fa flags
+include:
+.Bl -tag -width "AG_FILEDLG_MASK_HIDDEN "
+.It AG_FILEDLG_COMPACT
+Proxy mode.
+Collapse to a single-line textbox and "..." button.
+The expand button shows a regular
+.Nm
+in a new window.
+If the user selects a file and clicks "OK", the file path is copied to the
+.Va textbox
+of the compact
+.Nm .
+.It AG_FILEDLG_MASK_EXT
+Mask unknown files by extension.
+.It AG_FILEDLG_MASK_HIDDEN
+Mask hidden files.
+.It AG_FILEDLG_MULTI
+Allow multiple files to be selected at once.
+.It AG_FILEDLG_CLOSEWIN
+Automatically close the
+.Nm
+widget's parent window when a file is selected.
+.It AG_FILEDLG_LOAD
+The selected file must exist and be readable or an error is returned to
+the user.
+.It AG_FILEDLG_SAVE
+The selected file must be writeable or an error is returned to the user.
+.It AG_FILEDLG_ASYNC
+Load/save routines will be executed in a separate thread.
+This flag is available only if agar was compiled with threads support.
+.It AG_FILEDLG_NOMASKOPTS
+Don't display "Mask files by extension" and "Mask hidden files" checkboxes.
+.It AG_FILEDLG_NOTYPESELECT
+Don't display the "Type:" selector dropbox.
+.It AG_FILEDLG_NOBUTTONS
+Don't display "OK" and "Cancel" buttons.
+.It AG_FILEDLG_HFILL
+Expand horizontally in parent container.
+.It AG_FILEDLG_VFILL
+Expand vertically in parent container.
+.It AG_FILEDLG_EXPAND
+Shorthand for
+.Dv AG_FILEDLG_HFILL | AG_FILEDLG_VFILL .
+.El
+.Pp
+The working directory can be retrieved as a newly-allocated string using
+.Fn AG_FileDlgGetDirectory ,
+or copied into a fixed-size buffer with
+.Fn AG_FileDlgCopyDirectory .
+.Fn AG_FileDlgSetDirectory .
+.Pp
+.Fn AG_FileDlgSetDirectoryMRU
+sets the working directory according to an
+.Xr AG_Config 3
+parameter named
+.Fa mruKey .
+If the parameter does not exist, it will be set to
+.Fa defaultDir
+(it is customary to use a name such as
+.Sq myapp.mru.foofiles ) .
+If
+.Fn AG_FileDlgSetDirectoryMRU
+is used, subsequent directory changes will cause the current
+.Xr AG_Config 3
+settings to be saved automatically.
+.Pp
+The current filename can be retrieved as a newly-allocated string using
+.Fn AG_FileDlgGetFilename ,
+or copied into a fixed-size buffer with
+.Fn AG_FileDlgCopyFilename .
+.Pp
+The
+.Fn AG_FileDlgSetFilename
+function sets the filename to initially display in the textbox.
+It is typically used in file saving dialogs.
+.Pp
+.Fn AG_FileDlgAddType
+registers a new type-specific event handler for a given file format (and
+associated set of filename extensions).
+If
+.Fa fn
+is non-NULL, it sets a type-specific callback to invoke when a file of
+the selected type is selected by the user.
+.Ft descr
+is a description of the file format and
+.Ft exts
+is a comma-separated list of filename extensions or special directives
+(enclosed in "<>").
+Syntax for extensions include:
+.Bl -tag -width "<=hello.txt/i> "
+.It ".txt" or "*.txt"
+Match all files ending in ".txt".
+.It "<-x>"
+Match all files that are executable by the effective owner of the process
+(using
+.Xr AG_GetFileInfo 3 ) .
+.It "<=hello.txt>"
+Only match
+.Pa hello.txt
+(case-sensitive exact match).
+.It "<=hello.txt/i>"
+Match
+.Pa hello.txt ,
+.Pa Hello.txt ,
+etc
+(case-insensitive).
+.El
+.Pp
+Type-specific handlers do not override the general "file-chosen" event handler
+when one exists (if both are set then the type-specific handler is run first,
+followed by "file-chosen").
+.Pp
+.Fn AG_FileDlgAddImageTypes
+registers a common handler for all image types recognized by
+.Xr AG_SurfaceFromFile 3
+(such as BMP, PNG and JPEG).
+.Pp
+.Fn AG_FileDlgCopyTypes
+copies the set of
+.Ft AG_FileType
+(and any associated type-specific options), from one
+.Nm
+to another.
+.Pp
+The
+.Fn AG_FileDlgRefresh
+function updates the displayed directory structure and current directory
+contents.
+.Sh OK/CANCEL ACTIONS
+By default, selecting a file will trigger the following checks:
+.Pp
+.Bl -enum -compact
+.It
+If
+.Dv AG_FILEDLG_LOAD
+or
+.Dv AG_FILEDLG_SAVE
+is set, check whether the file is readable or writeable.
+.It
+If
+.Dv AG_FILEDLG_SAVE
+is set and a file exists, display a "Replace file?" prompt.
+.It
+Execute the format-specific callback, as previously configured with
+.Fn AG_FileDlgAddType .
+.It
+If
+.Dv AG_FILEDLG_CLOSEWIN
+is set, close the parent window.
+.El
+.Pp
+The default action performed when a user clicks on "Cancel" is simply to
+close the parent window if
+.Dv AG_FILEDLG_CLOSEWIN
+is set.
+.Pp
+These default actions can be overridden using the functions below:
+.Pp
+.nr nS 1
+.Ft "void"
+.Fn AG_FileDlgOkAction "AG_FileDlg *fd" "void (*fn)(AG_Event *)" "const char *fmt" "..."
+.Pp
+.Ft "void"
+.Fn AG_FileDlgCancelAction "AG_FileDlg *fd" "void (*fn)(AG_Event *)" "const char *fmt" "..."
+.Pp
+.Ft "int"
+.Fn AG_FileDlgCheckReadAccess "AG_FileDlg *fd"
+.Pp
+.Ft "int"
+.Fn AG_FileDlgCheckWriteAccess "AG_FileDlg *fd"
+.Pp
+.nr nS 0
+The
+.Fn AG_FileDlgOkAction
+function configures an event handler function to invoke when a file is
+selected, overriding the default behavior.
+The event handler will be passed a string argument containing the
+absolute path to the selected file, followed by a pointer to the
+.Ft AG_FileType
+structure for the file type selected by the user (see
+.Sx STRUCTURE DATA
+for details).
+.Pp
+.Fn AG_FileDlgCancelAction
+overrides the default behavior of the "Cancel" button.
+.Pp
+.Fn AG_FileDlgCheckReadAccess
+and
+.Fn AG_FileDlgCheckWriteAccess
+evaluate whether the selected file is readable or writeable.
+.Sh FORMAT-SPECIFIC OPTIONS
+When we are using
+.Nm
+to load and save files, we may want to provide the user with format-specific
+options that will affect the loading or saving process.
+Format-specific options are associated with a file type (an
+.Ft AG_FileType
+as returned by
+.Fn AG_FileDlgAddType ) .
+When a file type is selected,
+.Nm
+displays basic widgets enabling the user to manipulate those options.
+.Pp
+.nr nS 1
+.Ft "void"
+.Fn AG_FileDlgSetOptionContainer "AG_FileDlg *fd" "AG_Widget *container"
+.Pp
+.Ft "AG_FileOption *"
+.Fn AG_FileOptionNewBool "AG_FileType *type" "const char *descr" "const char *key" "int default"
+.Pp
+.Ft "AG_FileOption *"
+.Fn AG_FileOptionNewInt "AG_FileType *type" "const char *descr" "const char *key" "int default" "int min" "int max"
+.Pp
+.Ft "AG_FileOption *"
+.Fn AG_FileOptionNewFlt "AG_FileType *type" "const char *descr" "const char *key" "float default" "float min" "float max" "const char *unit"
+.Pp
+.Ft "AG_FileOption *"
+.Fn AG_FileOptionNewDbl "AG_FileType *type" "const char *descr" "const char *key" "double default" "double min" "double max" "const char *unit"
+.Pp
+.Ft "AG_FileOption *"
+.Fn AG_FileOptionGet "AG_FileType *type" "const char *key"
+.Pp
+.Ft "int"
+.Fn AG_FileOptionBool "AG_FileType *type" "const char *key"
+.Pp
+.Ft "int"
+.Fn AG_FileOptionInt "AG_FileType *type" "const char *key"
+.Pp
+.Ft "float"
+.Fn AG_FileOptionFlt "AG_FileType *type" "const char *key"
+.Pp
+.Ft "double"
+.Fn AG_FileOptionDbl "AG_FileType *type" "const char *key"
+.Pp
+.nr nS 0
+.Fn AG_FileDlgSetOptionContainer
+arranges for the given container widget to hold the control
+widgets that will be dynamically created.
+.Pp
+.Fn AG_FileOptionNewBool
+registers a boolean option, manipulated by an
+.Xr AG_Checkbox 3 .
+.Fa descr
+is a description string and
+.Fa key
+is a handle that the save/load routine will use to retrieve the option.
+.Fa default
+indicates the initial value of the option (1 = true, 0 = false).
+.Pp
+.Fn AG_FileOptionNewInt
+registers an integer option, manipulated by an
+.Xr AG_Numerical 3 .
+.Fa default
+is the initial value,
+.Fa min
+and
+.Fa max
+define the bounds.
+.Pp
+.Fn AG_FileOptionNewFlt
+and
+.Fn AG_FileOptionNewDbl
+register single and double precision floating-point options, using
+.Xr AG_Numerical 3 .
+.Fa default
+is the initial value,
+.Fa min
+and
+.Fa max
+define the bounds
+and
+.Fa unit ,
+if not NULL, is the unit system to use (see
+.Xr AG_Units 3 ) .
+.Pp
+.Fn AG_FileOptionGet
+returns a pointer to the
+.Ft AG_FileOption
+structure for the given option name, or NULL if there is no such option.
+.Fn AG_FileOptionBool ,
+.Fn AG_FileOptionInt ,
+.Fn AG_FileOptionFlt
+and
+.Fn AG_FileOptionDbl
+return the value of the given option.
+.Sh BINDINGS
+The
+.Nm
+widget does not provide any bindings.
+.Sh EVENTS
+The
+.Nm
+widget generates the following events:
+.Bl -tag -width 2n
+.It Fn file-chosen "char *path" "AG_FileType *type"
+User has selected the given file.
+.Fa path
+is the full pathname to the file.
+If not NULL,
+.Fa type
+describes the matching type of the file.
+.It Fn file-selected "char *path"
+User has moved selection over the given file, where
+.Fa path
+is the full pathname to it.
+This event is useful for things like previewing file contents using
+an external widget.
+.It Fn dir-selected "char *path"
+The given directory was selected.
+.El
+.Sh STRUCTURE DATA
+For the
+.Ft AG_FileDlg
+object:
+.Pp
+.Bl -tag -width "char cfile[AG_PATHNAME_MAX] " -compact
+.It Ft char cwd[AG_PATHNAME_MAX]
+Absolute path of current working directory.
+.It Ft char cfile[AG_PATHNAME_MAX]
+Absolute path of last selected file.
+.El
+.Pp
+For the
+.Ft AG_FileType
+structure (as returned by
+.Fn AG_FileDlgAddType ) :
+.Pp
+.Bl -tag -width "const char *descr " -compact
+.It Ft AG_FileDlg *fd
+Back pointer to the parent
+.Ft AG_FileDlg
+(read-only).
+.It Ft char **exts
+List of associated file extensions.
+.It Ft Uint nExts
+Count of file extensions.
+.It Ft const char *descr
+Description string (read-only).
+.It Ft AG_Event *action
+Callback function (as returned by
+.Xr AG_SetEvent 3 )
+to invoke when a file of this type is selected for a load/save operation.
+.El
+.Sh EXAMPLES
+See
+.Pa tests/loader.c
+in the Agar source distribution.
+.Sh SEE ALSO
+.Xr AG_DirDlg 3 ,
+.Xr AG_Intro 3 ,
+.Xr AG_Limits 3 ,
+.Xr AG_Widget 3 ,
+.Xr AG_Window 3
+.Sh HISTORY
+The
+.Nm
+widget first appeared in Agar 1.0.
+The
+.Dv AG_FILEDLG_COMPACT
+option as well as
+.Fn AG_FileDlgNewCompact ,
+.Fn AG_FileDlgNewCompactMRU ,
+.Fn AG_FileDlgGetDirectory ,
+.Fn AG_FileDlgCopyDirectory ,
+.Fn AG_FileDlgGetFilename ,
+.Fn AG_FileDlgCopyFilename ,
+.Fn AG_FileDlgCopyTypes
+and
+.Fn AG_FileDlgAddImageTypes
+routines appeared in Agar 1.6.0.
