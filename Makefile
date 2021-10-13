@@ -1,8 +1,5 @@
-#emscripten, pthreads and simd enabled by default
-JAVASCRIPT_MT :=1
-AUTOVECTOR :=1
 CXX      := g++
-CXXFLAGS := -std=c++0x -pedantic -Wall
+CXXFLAGS := -std=c++0x -pedantic -Wall -Wno-gnu-anonymous-struct -Wno-nested-anon-types
 #-fno-exceptions
 #LDFLAGS  := -L/opt/local/lib 
 LIBS     := -lm
@@ -31,7 +28,7 @@ ifdef NOTHREADS
 CXXFLAGS += -D_NO_THREADS
 endif
 
-ifeq (JAVASCRIPT_MT,1)
+ifdef JAVASCRIPT_MT
 JAVASCRIPT=1
 CXXFLAGS += -D_JAVASCRIPT_MT -s USE_PTHREADS=1 -pthread
 LDFLAGS += -D_JAVASCRIPT_MT -s USE_PTHREADS=1 -pthread -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency
