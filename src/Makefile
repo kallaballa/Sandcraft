@@ -20,10 +20,8 @@ endif
 
 ifndef AMIGA
 ifndef JAVASCRIPT
-ifndef JAVASCRIPT_MT
 CXXFLAGS += `pkg-config --cflags SDL_image x11 freetype2 fontconfig libpng`
 LIBS += `pkg-config --libs SDL_image x11 freetype2 fontconfig libpng`
-endif
 endif
 endif
 

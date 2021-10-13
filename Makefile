@@ -1,3 +1,6 @@
+#emscripten, pthreads and simd enabled by default
+JAVASCRIPT_MT :=1
+AUTOVECTOR :=1
 CXX      := g++
 CXXFLAGS := -std=c++0x -pedantic -Wall
 #-fno-exceptions
@@ -16,80 +19,22 @@ ifeq ($(UNAME_P),x86_64)
 LIBDIR = lib64
 endif
 
-ifdef BENCHMARK_ONLY
-CXXFLAGS += -D_BENCHMARK_ONLY
-endif
-
-ifndef JAVASCRIPT
-ifndef AMIGA
-#CXXFLAGS += -march=native
-endif
-endif
-
-
-
-ifdef AMIGA
-FIXEDPOINT=1
-NOTHREADS=1
-NOSHADOW=1
-CXXFLAGS += -D_NO_STACKTRACE -mhard-float -mcrt=nix13 -D_AMIGA -Wa,-march=${AMIGA} -Wa,-mcpu=${AMIGA} -march=${AMIGA} -mtune=${AMIGA} -mcpu=${AMIGA} -fbbb=+
-LDFLAGS+= -mcrt=nix13
+ifeq ($(UNAME_S), Darwin)
+ LDFLAGS += -L/opt/X11/lib/
 endif
 
 ifndef TIMETRACK
 CXXFLAGS += -D_NO_TIMETRACK
 endif
 
-ifdef  
-CXXFLAGS += -D_NO_SHADOW
-endif
-
-ifdef NOSHADOW 
-CXXFLAGS += -D_NO_SHADOW
-endif
-
 ifdef NOTHREADS
 CXXFLAGS += -D_NO_THREADS
 endif
 
-ifdef LOWRES
-CXXFLAGS += -D_LOW_RES
-else
-  ifdef HIGHRES
-CXXFLAGS += -D_HIGH_RES
-  else
-    ifdef ULTRARES
-CXXFLAGS += -D_ULTRA_RES
-    endif
-  endif
-endif
-
-ifdef SLOWZOOM
-CXXFLAGS += -D_SLOW_ZOOM
-else
-  ifdef FASTZOOM
-CXXFLAGS += -D_FAST_ZOOM
-  else
-    ifdef FASTERZOOM
-CXXFLAGS += -D_FASTER_ZOOM
-    endif
-  endif
-endif
-
-
-
-ifdef JAVASCRIPT_MT
+ifeq (JAVASCRIPT_MT,1)
 JAVASCRIPT=1
 CXXFLAGS += -D_JAVASCRIPT_MT -s USE_PTHREADS=1 -pthread
 LDFLAGS += -D_JAVASCRIPT_MT -s USE_PTHREADS=1 -pthread -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency
-endif
-
-ifeq ($(UNAME_S), Darwin)
- LDFLAGS += -L/opt/X11/lib/
-else
-ifndef JAVASCRIPT
-# CXXFLAGS += -march=native
-endif
 endif
 
 ifdef JAVASCRIPT
@@ -111,15 +56,6 @@ endif
 
 ifdef AUTOVECTOR
 CXXFLAGS += -D_AUTOVECTOR
-endif
-
-
-ifdef FIXEDPOINT
-ifdef AMIGA
-CXXFLAGS +=-msoft-float -D_FIXEDPOINT
-else
-CXXFLAGS += -D_FIXEDPOINT
-endif
 endif
 
 ifdef X86
@@ -204,15 +140,12 @@ export LIBS
 
 dirs:
 	${MAKE} -C src/ ${MAKEFLAGS} CXX=${CXX} ${MAKECMDGOALS}
-#	${MAKE} -C exp/ ${MAKEFLAGS} CXX=${CXX} ${MAKECMDGOALS}
 
 debian-release:
 	${MAKE} -C src/ -${MAKEFLAGS} CXX=${CXX} release
-#	${MAKE} -C exp/ -${MAKEFLAGS} CXX=${CXX} release
 	
 debian-clean:
 	${MAKE} -C src/ -${MAKEFLAGS} CXX=${CXX} clean
-#	${MAKE} -C exp/ -${MAKEFLAGS} CXX=${CXX} clean
 	
 install: ${TARGET}
 	true
