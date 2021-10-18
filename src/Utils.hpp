@@ -3,6 +3,8 @@
 
 #include <string>
 #include <cstdint>
+#include <random>
+#include <algorithm>
 #include <SDL/SDL.h>
 
 namespace sandcraft {
@@ -13,6 +15,8 @@ namespace utils {
 	void srand(unsigned int seed);
     void srand();
     unsigned int rand();
+    std::string random_id(size_t length);
+
 }
 
 } /* namespace sandcraft */

@@ -19,6 +19,7 @@ public:
 	int btn_middle_row_y_ = 0;
 	int btn_lower_row_y_ = 0;
 	size_t dboard_height_ = 0;
+	int port_ = 9999;
 
 	//Init and declare ParticleSwapping
 	bool implementParticleSwaps_ = true;

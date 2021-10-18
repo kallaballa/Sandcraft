@@ -1,5 +1,5 @@
 CXX      := g++
-CXXFLAGS := -std=c++0x -pedantic -Wall -Wno-gnu-anonymous-struct -Wno-nested-anon-types
+CXXFLAGS := -std=c++17 -pedantic -Wall -Wno-gnu-anonymous-struct -Wno-nested-anon-types
 #-fno-exceptions
 #LDFLAGS  := -L/opt/local/lib 
 LIBS     := -lm
@@ -36,12 +36,12 @@ endif
 
 ifdef JAVASCRIPT
 CXX	:= em++
-EMCXXFLAGS = -D_JAVASCRIPT -D_NO_STACKTRACE -flto
+EMCXXFLAGS = -D_JAVASCRIPT -D_NO_STACKTRACE -flto -I../third/datachannel-wasm/wasm/include/
 #EMCXXFLAGS +=  -s DISABLE_EXCEPTION_CATCHING=1
 ifndef JAVASCRIPT_MT
-EMCXXFLAGS += -D_NO_THREADS
+EMCXXFLAGS += -D_NO_THREADS -s DYNCALLS=1
 endif
-EMLDFLAGS +=  -s INITIAL_MEMORY=419430400 -s TOTAL_STACK=52428800 -s WASM_BIGINT -s "EXPORTED_FUNCTIONS=['_load_image', '_main' ]" -s EXPORTED_RUNTIME_METHODS='["ccall"]' -s FORCE_FILESYSTEM=1 -s STB_IMAGE=1 -s USE_SDL_IMAGE=1 -s USE_SDL_TTF=1 -s USE_LIBPNG=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0
+EMLDFLAGS += -L../third/datachannel-wasm/build/ -s INITIAL_MEMORY=419430400 -s TOTAL_STACK=52428800 -s WASM_BIGINT -s "EXPORTED_FUNCTIONS=['_load_image', '_main' ]" -s EXPORTED_RUNTIME_METHODS='["ccall","dynCall"]' -s FORCE_FILESYSTEM=1 -s STB_IMAGE=1 -s USE_SDL_IMAGE=1 -s USE_SDL_TTF=1 -s USE_LIBPNG=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s DYNCALLS=1
 
 ifdef AUTOVECTOR
 EMCXXFLAGS += -msimd128

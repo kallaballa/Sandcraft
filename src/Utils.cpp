@@ -6,10 +6,9 @@
 namespace sandcraft {
 
 namespace {
-    static unsigned int s_rand_high = 1;
-    static unsigned int s_rand_low = 1 ^ 0x49616E42;
+static unsigned int s_rand_high = 1;
+static unsigned int s_rand_low = 1 ^ 0x49616E42;
 }
-
 
 std::string utils::int_to_hex_color(SDL_PixelFormat* format, uint32_t i) {
 	uint8_t r, g, b;
@@ -21,23 +20,33 @@ std::string utils::int_to_hex_color(SDL_PixelFormat* format, uint32_t i) {
 	return stream.str();
 }
 
-void utils::srand(unsigned int seed)
-{
-    s_rand_high = seed;
-    s_rand_low = seed ^ 0x49616E42;
+void utils::srand(unsigned int seed) {
+	s_rand_high = seed;
+	s_rand_low = seed ^ 0x49616E42;
 }
 
-void utils::srand()
-{
-    utils::srand(static_cast<unsigned int>(time(0)));
+void utils::srand() {
+	utils::srand(static_cast<unsigned int>(time(0)));
 }
 
 unsigned int utils::rand() {
-    static const int shift = sizeof(int) / 2;
-    s_rand_high = (s_rand_high >> shift) + (s_rand_high << shift);
-    s_rand_high += s_rand_low;
-    s_rand_low += s_rand_high;
-    return s_rand_high;
+	static const int shift = sizeof(int) / 2;
+	s_rand_high = (s_rand_high >> shift) + (s_rand_high << shift);
+	s_rand_high += s_rand_low;
+	s_rand_low += s_rand_high;
+	return s_rand_high;
+}
+
+std::string utils::random_id(size_t length) {
+	using namespace std;
+	static const string characters(
+			"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+	string id(length, '0');
+
+	default_random_engine rng(random_device { }());
+	uniform_int_distribution<int> dist(0, int(characters.size() - 1));
+	generate(id.begin(), id.end(), [&]() {return characters.at(dist(rng));});
+	return id;
 }
 
 } /* namespace sandcraft */

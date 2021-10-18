@@ -27,6 +27,8 @@
 #include "Scene.hpp"
 #include "Error.hpp"
 #include "Slots.hpp"
+#include "WebsocketClient.hpp"
+#include "WebRTC.hpp"
 
 #ifdef __EMSCRIPTEN__
 #include "SDL_emscripten.hpp"
@@ -43,10 +45,10 @@ AG_Window* HELPWND = nullptr;
 AG_Window* DASHWND = nullptr;
 Buttons* BUTTONS = nullptr;
 std::thread* EVTHREAD = nullptr;
-AG_Driver *DRV = nullptr;
+AG_Driver* DRV = nullptr;
+WebsocketClient* CLIENT = nullptr;
+WebRTC* RTC = nullptr;
 
-
-// Initializing the SDL->screen
 void init() {
 	std::cerr << "init" << std::endl;
 	try {
@@ -55,6 +57,9 @@ void init() {
 		cfg.btn_middle_row_y_ = cfg.height_ - cfg.btn_size_ - 4;
 		cfg.btn_lower_row_y_ = cfg.height_ - cfg.btn_size_ - 4;
 		cfg.dboard_height_ = cfg.btn_size_ + 8;
+
+		RTC = new WebRTC();
+		CLIENT = new WebsocketClient(cfg.port_, RTC);
 		SDL = new SDLHelper();
 		COLORS = new Palette(SDL->screen_->format);
 		PARTICLES = new Particles();
@@ -74,8 +79,10 @@ void init() {
 
 			for (size_t i = 0; i < BUTTONS->size(); ++i) {
 				auto btn = AG_ButtonNewFn(DASHWND, AG_BUTTON_HFILL,
-						(*BUTTONS)[i].name.c_str(), event::Slots::button_handler, "%d", (i));
-				string c = utils::int_to_hex_color(SDL->screen_->format, (*BUTTONS)[i].color);
+						(*BUTTONS)[i].name.c_str(),
+						event::Slots::button_handler, "%d", (i));
+				string c = utils::int_to_hex_color(SDL->screen_->format,
+						(*BUTTONS)[i].color);
 				AG_SetStyle(btn, "padding", "2");
 				AG_SetStyle(btn, "font-size", "60%");
 				AG_SetStyle(btn, "font-weight", "bold");
@@ -180,6 +187,48 @@ void step() {
 
 }
 
+void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
+	Config& cfg = Config::getInstance();
+	GameState& gs = GameState::getInstance();
+	try {
+		tick++;
+		t2 = AG_GetTicks();
+		if (t2 - t1 >= 1000 / 60) {
+			if(WebsocketClient::rtc_->dc_ && WebsocketClient::rtc_->dc_->isOpen()) {
+				WebsocketClient::rtc_->dc_->send("hi");
+				std::cerr << "SEND HI" << std::endl;
+			}
+
+			if (SDL_MUSTLOCK(SDL->screen_)) {
+				if (SDL_LockSurface(SDL->screen_) < 0) {
+					return;
+				}
+			}
+
+			SCENE->draw();
+
+			if (DASHWND != nullptr && DASHWND->visible) {
+				AG_WindowDraw(DASHWND);
+			}
+			if (HELPWND != nullptr && HELPWND->visible) {
+				AG_WindowDraw(HELPWND);
+			}
+
+			//SDL->drawCursor(gs.oldx_, gs.oldy_);
+			if (SDL_MUSTLOCK(SDL->screen_)) {
+				SDL_UnlockSurface(SDL->screen_);
+			}
+			SDL_Flip(SDL->screen_);
+			t1 = AG_GetTicks();
+		}
+		AG_ProcessTimeouts(t2);
+		PARTICLES->logic();
+		std::this_thread::yield();
+	} catch (...) {
+		std::cerr << "exception" << std::endl;
+	}
+
+}
 int main(int argc, char **argv) {
 	using namespace sandcraft;
 #ifndef __EMSCRIPTEN__
@@ -218,88 +267,18 @@ int main(int argc, char **argv) {
 		}
 	}
 	init();
-
-	int tick = 0;
-
 	// Set initial seed
 	utils::srand();
 
 	gs.oldx_ = cfg.width_ / 2, gs.oldy_ = cfg.height_ / 2;
 
-	//The game loop
-	int lastWidth = SDL->screen_->w;
-	int lastHeight = SDL->screen_->h;
-
-	AG_Window *win;
+	long tick = 0;
 	Uint32 t1, t2;
-
 	t1 = AG_GetTicks();
 
 	STEP_FUNC = [&]() {
-		try {
-			tick++;
-
-			t2 = AG_GetTicks();
-			if(t2-t1 >= 1000/60) {
-//			int cw = get_canvas_width();
-//			int ch = get_canvas_height();
-//			if ((cw > 0 && ch > 0) && (lastWidth != cw || lastHeight != ch)) {
-//				destroy();
-//				cfg.width_ = lastWidth = cw;
-//				cfg.height_ = lastHeight = ch;
-//				init();
-//			}
-
-			if (SDL_MUSTLOCK(SDL->screen_)) {
-				if (SDL_LockSurface(SDL->screen_) < 0) {
-					return;
-				}
-			}
-
-			SCENE->draw();
-//				SDL->drawPenSize();
-
-			if(DASHWND != nullptr && DASHWND->visible) {
-				AG_WindowDraw(DASHWND);
-			}
-			if(HELPWND != nullptr && HELPWND->visible) {
-				AG_WindowDraw(HELPWND);
-			}
-
-			//SDL->drawCursor(gs.oldx_, gs.oldy_);
-			if (SDL_MUSTLOCK(SDL->screen_)) {
-				SDL_UnlockSurface(SDL->screen_);
-			}
-			SDL_Flip(SDL->screen_);
-			t1 = AG_GetTicks();
-		}
-		AG_ProcessTimeouts(t2);
-
-//To emit or not to emit
-		if(gs.emitWater_)
-		PARTICLES->Emit((cfg.width_/2 - ((cfg.width_/6)*2)), 20, WATER, gs.waterDens_);
-		if(gs.emitSand_)
-		PARTICLES->Emit((cfg.width_/2 - (cfg.width_/6)), 20, SAND, gs.sandDens_);
-		if(gs.emitSalt_)
-		PARTICLES->Emit((cfg.width_/2 + (cfg.width_/6)), 20, SALT, gs.saltDens_);
-		if(gs.emitOil_)
-		PARTICLES->Emit((cfg.width_/2 + ((cfg.width_/6)*2)), 20, OIL, gs.oilDens_);
-
-//If the button is pressed (and no event has occured since last frame due
-// to the polling procedure, then draw at the position (enabeling 'dynamic emitters')
-		if(gs.mouse_down_)
-		PARTICLES->DrawLine(gs.oldx_,gs.oldy_,gs.oldx_,gs.oldy_);
-
-//Clear bottom line
-		for (int i=0; i< cfg.width_; i++) (*PARTICLES)[i+((cfg.height_-cfg.dboard_height_-1)*cfg.width_)] = NOTHING;
-//Clear top line
-		for (int i=0; i< cfg.width_; i++) (*PARTICLES)[i+((0)*cfg.width_)] = NOTHING;
-		PARTICLES->UpdateVirtualScreen();
-		std::this_thread::yield();
-	} catch(...) {
-		std::cerr << "exception" << std::endl;
-	}
-};
+		single_player_step(tick, t1, t2);
+	};
 
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop(step, 0, 1);
@@ -311,6 +290,7 @@ int main(int argc, char **argv) {
 	SDL_Quit();
 	if (SDL_NumJoysticks() > 0)
 		SDL_JoystickClose(0);
+
 	return 0;
 }
 

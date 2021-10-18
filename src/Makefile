@@ -8,7 +8,7 @@ ifdef JAVASCRIPT_MT
 TARGET := sandcraft.js
 endif
 
-SRCS  := main.cpp CmdLine.cpp Palette.cpp Config.cpp GameState.cpp Particles.cpp Renderer.cpp SDLHelper.cpp Utils.cpp Scene.cpp Error.cpp Slots.cpp
+SRCS  := main.cpp CmdLine.cpp Palette.cpp Config.cpp GameState.cpp Particles.cpp Renderer.cpp SDLHelper.cpp Utils.cpp Scene.cpp Error.cpp Slots.cpp WebsocketClient.cpp WebRTC.cpp
 
 
 ifndef AMIGA
@@ -20,9 +20,16 @@ endif
 
 ifndef AMIGA
 ifndef JAVASCRIPT
+ifndef JAVASCRIPT_MT
 CXXFLAGS += `pkg-config --cflags SDL_image x11 freetype2 fontconfig libpng`
 LIBS += `pkg-config --libs SDL_image x11 freetype2 fontconfig libpng`
 endif
+endif
+endif
+
+ifdef JAVASCRIPT_MT
+LDFLAGS += --js-library ../third/datachannel-wasm/wasm/js/webrtc.js
+LIBS += -ldatachannel-wasm -lwebsocket.js
 endif
 
 #precompiled headers

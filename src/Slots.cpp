@@ -22,7 +22,7 @@ void Slots::process_events() {
 	while (AG_GetNextEvent(DRV, &dev)) {
 		//Key strokes
 		if (dev.type == AG_DRIVER_KEY_DOWN) {
-			switch (dev.data.key.ks) {
+			switch ((SDLKey)dev.data.key.ks) {
 				case SDLK_ESCAPE: //Exit
 					gs.done_ = 1;
 					break;
@@ -72,7 +72,7 @@ void Slots::process_events() {
 					break;
 			}
 		} else if (dev.type == AG_DRIVER_KEY_UP) {
-			switch (dev.data.key.ks) {
+			switch ((SDLKey)dev.data.key.ks) {
 				case SDLK_LSHIFT:
 				case SDLK_RSHIFT:
 					gs.shift_down_ = false;
@@ -125,7 +125,7 @@ void Slots::process_events() {
 		if (gs.mouse_down_) {
 			auto mme = dev.data.motion;
 
-			PARTICLES->DrawLine(gs.oldx_, gs.oldy_, mme.x, mme.y);
+			PARTICLES->drawLine(gs.oldx_, gs.oldy_, mme.x, mme.y);
 			gs.oldx_ = mme.x;
 			gs.oldy_ = mme.y;
 		}

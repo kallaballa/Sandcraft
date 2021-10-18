@@ -114,14 +114,15 @@ public:
 		return vs_[i];
 	}
 
-	void Emit(int x, int width, ParticleType type, float p);
-	void InertParticleLogic(int x, int y, ParticleType type);
-	void MoveParticle(int x, int y, ParticleType type);
-	void DrawParticles(int xpos, int ypos, int radius, ParticleType type);
-	void DrawLine(int newx, int newy, int oldx, int oldy);
-	void DoRandomLines(ParticleType type);
-	void UpdateVirtualPixel(int x, int y);
-	void UpdateVirtualScreen();
+	void emit(int x, int width, ParticleType type, float p);
+	void inertParticleLogic(int x, int y, ParticleType type);
+	void moveParticle(int x, int y, ParticleType type);
+	void drawParticles(int xpos, int ypos, int radius, ParticleType type);
+	void drawLine(int newx, int newy, int oldx, int oldy);
+	void doRandomLines(ParticleType type);
+	void updateVirtualPixel(int x, int y);
+	void updateVirtualScreen();
+	void logic();
 	void clear();
 };
 
