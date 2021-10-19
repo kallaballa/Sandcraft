@@ -20,12 +20,14 @@ namespace sandcraft {
 class WebRTC {
 private:
 	Configuration config_;
+	std::function<void(std::vector<byte>)> cbMsg_;
+	bool is_open = false;
 public:
 	shared_ptr<DataChannel> dc_ = nullptr;
 	shared_ptr<PeerConnection> pc_ = nullptr;
 
 	void init(std::function<void(Description)> cbDesc, std::function<void(Candidate)> cbCand) {
-		config_.iceServers.emplace_back("stun:stun.l.google.com:19302");
+//		config_.iceServers.emplace_back("stun:stun.l.google.com:19302");
 		std::cerr << "INIT: " << std::endl;
 		pc_ = std::make_shared<PeerConnection>(config_);
 
@@ -47,19 +49,27 @@ public:
 
 	void answer(const Description& desc) {
 		string sdp = desc.operator std::string();
-		std::cerr << "ANSWER: " << '\n' << sdp << std::endl;
+		std::cerr << "ANSWER: " << std::endl;
 
 		pc_->onDataChannel([&](shared_ptr<DataChannel> _dc) {
+			is_open = false;
+
 			cout << "[Got a DataChannel with label: " << _dc->label() << "]" << endl;
 			dc_ = _dc;
 
-			dc_->onOpen([&]() { cout << "[DataChannel open: " << dc_->label() << "]" << endl; });
+			dc_->onOpen([&]() {
+				cout << "[DataChannel open: " << dc_->label() << "]" << endl;
+				is_open = true;
+			});
 
-			dc_->onClosed([&]() { cout << "[DataChannel closed: " << dc_->label() << "]" << endl; });
+			dc_->onClosed([&]() {
+				cout << "[DataChannel closed: " << dc_->label() << "]" << endl;
+				is_open = false;
+			});
 
-			dc_->onMessage([](variant<binary, string> message) {
-				if (holds_alternative<string>(message)) {
-					cout << "[Received: " << get<string>(message) << "]" << endl;
+			dc_->onMessage([&](variant<binary, string> message) {
+				if (holds_alternative<binary>(message)) {
+					cbMsg_(get<binary>(message));
 				}
 			});
 		});
@@ -69,25 +79,34 @@ public:
 
 	void offer(const Description& desc) {
 		string sdp = desc.operator std::string();
-		std::cerr << "OFFER: " << '\n' << sdp << std::endl;
-		dc_->onOpen([&]() { cout << "[DataChannel open: " << dc_->label() << "]" << endl; });
+		std::cerr << "OFFER: " << std::endl;
+		dc_->onOpen([&]() {
+			cout << "[DataChannel open: " << dc_->label() << "]" << endl;
+			is_open = true;
+		});
 
-		dc_->onClosed([&]() { cout << "[DataChannel closed: " << dc_->label() << "]" << endl; });
+		dc_->onClosed([&]() {
+			cout << "[DataChannel closed: " << dc_->label() << "]" << endl;
+			is_open = false;
+		});
 
-		dc_->onMessage([](variant<binary, string> message) {
-			if (holds_alternative<string>(message)) {
-				cout << "[Received: " << get<string>(message) << "]" << endl;
+		dc_->onMessage([&](variant<binary, string> message) {
+			if (holds_alternative<binary>(message)) {
+				cbMsg_(get<binary>(message));
 			}
 		});
 		pc_->setRemoteDescription(Description(sdp, "answer"));
-
 	}
 
 public:
-	WebRTC() {
+	WebRTC(std::function<void(std::vector<byte>)> cbMsg) : cbMsg_(cbMsg) {
 	}
 	virtual ~WebRTC() {
 
+	}
+
+	bool isOpen() {
+		return is_open;
 	}
 };
 

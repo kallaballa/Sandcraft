@@ -33,6 +33,7 @@ public:
 	bool ctrl_down_ = false;
 	bool alt_down_ = false;
 	bool shift_down_ = false;
+	bool isHost = false;
 
 	static GameState& getInstance() {
 		if(instance_ == nullptr)

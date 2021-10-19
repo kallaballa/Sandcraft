@@ -116,8 +116,8 @@ hardcore: LDFLAGS += -s
 hardcore: dirs
 
 ifdef JAVASCRIPT
-asan: CXXFLAGS += -fsanitize=address
-asan: LDFLAGS += -s STACK_OVERFLOW_CHECK=2 -s ASSERTIONS=2 -s NO_DISABLE_EXCEPTION_CATCHING=1 -s EXCEPTION_DEBUG=1 -fsanitize=address
+asan: CXXFLAGS += -fsanitize=undefined
+asan: LDFLAGS += -s STACK_OVERFLOW_CHECK=2 -s ASSERTIONS=2 -s NO_DISABLE_EXCEPTION_CATCHING=1 -s EXCEPTION_DEBUG=1 -fsanitize=undefined
 else
 asan: CXXFLAGS += -rdynamic -fsanitize=address
 asan: LDFLAGS += -rdynamic -fsanitize=address

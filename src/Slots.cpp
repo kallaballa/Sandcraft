@@ -124,8 +124,11 @@ void Slots::process_events() {
 	if (dev.type == AG_DRIVER_MOUSE_MOTION) {
 		if (gs.mouse_down_) {
 			auto mme = dev.data.motion;
-
-			PARTICLES->drawLine(gs.oldx_, gs.oldy_, mme.x, mme.y);
+//			std::cout << "motion:" << gs.oldx_ << ':' << gs.oldy_ << ':' << mme.x <<  ':' << mme.y << std::endl;
+			if(gs.isHost)
+				PARTICLES->drawLine(gs.oldx_, gs.oldy_, mme.x, mme.y);
+			else
+				PARTICLES->triggerLineEvent(gs.oldx_, gs.oldy_, mme.x, mme.y);
 			gs.oldx_ = mme.x;
 			gs.oldy_ = mme.y;
 		}
@@ -137,7 +140,6 @@ void Slots::process_events() {
 
 	AG_ProcessEvent(DRV, &dev);
 	AG_WindowProcessQueued();
-	AG_Delay(1);
 }
 
 void Slots::activate_particle(size_t i) {

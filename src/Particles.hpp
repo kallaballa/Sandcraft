@@ -4,6 +4,8 @@
 #include "Config.hpp"
 #include "GameState.hpp"
 #include <iostream>
+#include <queue>
+#include <mutex>
 
 namespace sandcraft {
 
@@ -72,21 +74,37 @@ enum ParticleType {
 	MOVEDELEC = 35
 };
 
+struct LineEvent {
+	int newX_ = 0;
+	int newY_ = 0;
+	int oldX_ = 0;
+	int oldY_ = 0;
+};
+
 class Particles {
 private:
 	//Instead of using a two dimensional array
 	// we'll use a simple array to improve speed
 	// vs = virtual screen
-	ParticleType *vs_;
+
 
 	// The current brush type
 	GameState& gs_ = GameState::getInstance();
 	Config& config_ = Config::getInstance();
+	std::queue<LineEvent> lineQ_;
+	std::mutex levmtx_;
 public:
+	ParticleType *vs_;
 	ParticleType currentParticleType_ = WALL;
-
-	Particles() {
+	std::function<void(int, int, int, int, ParticleType)> drawLineCallback_;
+	Particles(std::function<void(int, int, int, int, ParticleType)> drawLineCallback) {
 		vs_ = new ParticleType[config_.width_ * config_.height_];
+		drawLineCallback_ = drawLineCallback;
+	}
+
+	void triggerLineEvent(int newx, int newy, int oldx, int oldy) {
+		std::unique_lock<std::mutex>(levmtx_);
+		lineQ_.push({newx , newy, oldx, oldy});
 	}
 
 	//Checks wether a given particle type is a inert element
@@ -119,6 +137,7 @@ public:
 	void moveParticle(int x, int y, ParticleType type);
 	void drawParticles(int xpos, int ypos, int radius, ParticleType type);
 	void drawLine(int newx, int newy, int oldx, int oldy);
+	void drawLine(int newx, int newy, int oldx, int oldy, ParticleType type, int penSize);
 	void doRandomLines(ParticleType type);
 	void updateVirtualPixel(int x, int y);
 	void updateVirtualScreen();

@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include "GameState.hpp"
 #include "Particles.hpp"
 
 namespace sandcraft {
@@ -528,16 +529,22 @@ void Particles::drawParticles(int xpos, int ypos, int radius,
 
 // Drawing a line
 void Particles::drawLine(int newx, int newy, int oldx, int oldy) {
-	GameState& gs = GameState::getInstance();
+	drawLineCallback_(newx, newy, oldx, oldy, currentParticleType_);
+//	if (GameState::getInstance().isHost)
+		drawLine(newx, newy, oldx, oldy, currentParticleType_, GameState::getInstance().penSize_);
+}
+
+void Particles::drawLine(int newx, int newy, int oldx, int oldy,
+		ParticleType type, int penSize) {
 	if (newx == oldx && newy == oldy) {
-		drawParticles(newx, newy, gs.penSize_, currentParticleType_);
+		drawParticles(newx, newy, penSize, type);
 	} else {
 		float step = 1.0f
 				/ ((abs(newx - oldx) > abs(newy - oldy)) ?
 						abs(newx - oldx) : abs(newy - oldy));
 		for (float a = 0; a < 1; a += step)
 			drawParticles(a * newx + (1 - a) * oldx, a * newy + (1 - a) * oldy,
-					gs.penSize_, currentParticleType_);
+					penSize, type);
 	}
 }
 
@@ -600,11 +607,22 @@ void Particles::logic() {
 		emit((cfg.width_ / 2 + (cfg.width_ / 6)), 20, SALT, gs.saltDens_);
 	if (gs.emitOil_)
 		emit((cfg.width_ / 2 + ((cfg.width_ / 6) * 2)), 20, OIL, gs.oilDens_);
-
 	//If the button is pressed (and no event has occured since last frame due
 	// to the polling procedure, then draw at the position (enabeling 'dynamic emitters')
-	if (gs.mouse_down_)
+	if (gs.mouse_down_) {
+//		std::cout << "point" << std::endl;
 		drawLine(gs.oldx_, gs.oldy_, gs.oldx_, gs.oldy_);
+	}
+
+	{
+		std::unique_lock<std::mutex>(levmtx_);
+		while(!lineQ_.empty()) {
+			auto& lev = lineQ_.front();
+//			std::cout << "lev" << std::endl;
+			drawLine(lev.newX_, lev.newY_,lev.oldX_, lev.oldY_);
+			lineQ_.pop();
+		}
+	}
 
 	//Clear bottom line
 	for (int i = 0; i < cfg.width_; i++)
@@ -614,7 +632,6 @@ void Particles::logic() {
 	for (int i = 0; i < cfg.width_; i++)
 		(*this)[i + ((0) * cfg.width_)] = NOTHING;
 	updateVirtualScreen();
-
 }
 
 //Cearing the particle system

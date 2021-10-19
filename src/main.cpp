@@ -13,6 +13,7 @@
 #include <SDL/SDL_stdinc.h>
 #include <agar/core.h>
 #include <agar/gui.h>
+#include <zlib.h>
 
 #include <thread>
 #include <functional>
@@ -27,8 +28,9 @@
 #include "Scene.hpp"
 #include "Error.hpp"
 #include "Slots.hpp"
-#include "WebsocketClient.hpp"
+#include "P2P.hpp"
 #include "WebRTC.hpp"
+
 
 #ifdef __EMSCRIPTEN__
 #include "SDL_emscripten.hpp"
@@ -43,14 +45,13 @@ SDLHelper* SDL = nullptr;
 Scene* SCENE = nullptr;
 AG_Window* HELPWND = nullptr;
 AG_Window* DASHWND = nullptr;
+
 Buttons* BUTTONS = nullptr;
 std::thread* EVTHREAD = nullptr;
 AG_Driver* DRV = nullptr;
-WebsocketClient* CLIENT = nullptr;
-WebRTC* RTC = nullptr;
-
+P2P* NEXUS = nullptr;
 void init() {
-	std::cerr << "init" << std::endl;
+	std::cerr << string("init") << std::endl;
 	try {
 		Config& cfg = Config::getInstance();
 		cfg.btn_upper_row_y_ = cfg.height_ - cfg.btn_size_ - 4;
@@ -58,11 +59,54 @@ void init() {
 		cfg.btn_lower_row_y_ = cfg.height_ - cfg.btn_size_ - 4;
 		cfg.dboard_height_ = cfg.btn_size_ + 8;
 
-		RTC = new WebRTC();
-		CLIENT = new WebsocketClient(cfg.port_, RTC);
+		NEXUS = new P2P("localhost", cfg.port_);
+		NEXUS->initRTC(
+				[&](std::vector<byte> data) {
+					if(NEXUS != nullptr && NEXUS->isOpen()) {
+						if(!GameState::getInstance().isHost) {
+							const char* msgdata = (const char*)data.data();
+							long decompLen = sizeof(ParticleType) * cfg.width_ + 2;
+							static char* decomp = new char[decompLen];
+
+							z_stream infstream;
+							z_stream defstream;
+							infstream.zalloc = Z_NULL;
+							infstream.zfree = Z_NULL;
+							infstream.opaque = Z_NULL;
+							// setup "b" as the input and "c" as the compressed output
+							infstream.avail_in = (uInt)data.size();
+							infstream.next_in = (Bytef *)msgdata;// input char array
+							infstream.avail_out = (uInt)decompLen;// size of output
+							infstream.next_out = (Bytef *)decomp;// output char array
+							inflateInit(&infstream);
+							inflate(&infstream, Z_NO_FLUSH);
+							inflateEnd(&infstream);
+//						    std::cerr << strlen(msgdata) << ":" << decompLen << std::endl;
+							uint16_t y = (*(uint16_t*)decomp);
+							memcpy(PARTICLES->vs_ + (cfg.width_ * y), decomp + 2, decompLen - 2);
+						} else {
+							assert(data.size() == 12);
+							const uint16_t* msgdata = (const uint16_t*)data.data();
+//							std::cout << msgdata[0] << ':' << msgdata[1] << ':' << msgdata[2] <<  ':' << msgdata[3] << std::endl;
+							if(PARTICLES != nullptr) {
+//								std::cout << "draw" << std::endl;
+								PARTICLES->drawLine(msgdata[0], msgdata[1], msgdata[2], msgdata[3],(ParticleType)msgdata[4], msgdata[5]);
+							}
+						}
+					} else {
+						std::cerr << "dropped" << std::endl;
+					}
+				});
+		PARTICLES =
+				new Particles(
+						[&](int newx, int newy, int oldx, int oldy, ParticleType type) {
+							if(NEXUS != nullptr && !GameState::getInstance().isHost && NEXUS->isOpen()) {
+//								std::cerr << "sendLine" << std::endl;
+								NEXUS->sendLine(newx, newy, oldx, oldy, type, GameState::getInstance().penSize_);
+							}
+						});
 		SDL = new SDLHelper();
 		COLORS = new Palette(SDL->screen_->format);
-		PARTICLES = new Particles();
 		SCENE = new Scene(SDL, PARTICLES, COLORS);
 		BUTTONS = new Buttons(COLORS);
 
@@ -137,6 +181,7 @@ void init() {
 		EVTHREAD = new std::thread([&]() {
 			while(true) {
 				event::Slots::process_events();
+				std::this_thread::yield();
 			}
 		});
 	} catch (std::exception& ex) {
@@ -193,10 +238,11 @@ void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
 	try {
 		tick++;
 		t2 = AG_GetTicks();
-		if (t2 - t1 >= 1000 / 60) {
-			if(WebsocketClient::rtc_->dc_ && WebsocketClient::rtc_->dc_->isOpen()) {
-				WebsocketClient::rtc_->dc_->send("hi");
-				std::cerr << "SEND HI" << std::endl;
+		if (t2 - t1 >= 1000 / 24) {
+			if (NEXUS != nullptr && GameState::getInstance().isHost && NEXUS->isOpen()) {
+				for (uint16_t y = 0; y < cfg.height_; ++y) {
+					NEXUS->sendParticleRow(y, *PARTICLES);
+				}
 			}
 
 			if (SDL_MUSTLOCK(SDL->screen_)) {
@@ -223,7 +269,6 @@ void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
 		}
 		AG_ProcessTimeouts(t2);
 		PARTICLES->logic();
-		std::this_thread::yield();
 	} catch (...) {
 		std::cerr << "exception" << std::endl;
 	}

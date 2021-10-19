@@ -8,11 +8,11 @@ ifdef JAVASCRIPT_MT
 TARGET := sandcraft.js
 endif
 
-SRCS  := main.cpp CmdLine.cpp Palette.cpp Config.cpp GameState.cpp Particles.cpp Renderer.cpp SDLHelper.cpp Utils.cpp Scene.cpp Error.cpp Slots.cpp WebsocketClient.cpp WebRTC.cpp
+SRCS  := main.cpp CmdLine.cpp Palette.cpp Config.cpp GameState.cpp Particles.cpp Renderer.cpp SDLHelper.cpp Utils.cpp Scene.cpp Error.cpp Slots.cpp P2P.cpp WebRTC.cpp
 
 
 ifndef AMIGA
-CXXFLAGS += `pkg-config --cflags sdl` `agar-config --cflags`
+CXXFLAGS += `pkg-config --cflags sdl` `agar-config --cflags` -I../third/zstr/src/
 LIBS += `pkg-config --libs sdl` `agar-config --libs`
 else
 LIBS += -lSDL -ldebug
