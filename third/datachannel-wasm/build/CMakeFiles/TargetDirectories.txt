@@ -1,0 +1,3 @@
+/home/elchaschab/devel/Sandcraft/third/datachannel-wasm/build/CMakeFiles/rebuild_cache.dir
+/home/elchaschab/devel/Sandcraft/third/datachannel-wasm/build/CMakeFiles/edit_cache.dir
+/home/elchaschab/devel/Sandcraft/third/datachannel-wasm/build/CMakeFiles/datachannel-wasm.dir

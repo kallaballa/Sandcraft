@@ -1,0 +1,2 @@
+/home/elchaschab/emsdk/upstream/emscripten/emar qc libdatachannel-wasm.a CMakeFiles/datachannel-wasm.dir/wasm/src/channel.cpp.o CMakeFiles/datachannel-wasm.dir/wasm/src/configuration.cpp.o CMakeFiles/datachannel-wasm.dir/wasm/src/datachannel.cpp.o CMakeFiles/datachannel-wasm.dir/wasm/src/peerconnection.cpp.o CMakeFiles/datachannel-wasm.dir/wasm/src/websocket.cpp.o
+/home/elchaschab/emsdk/upstream/emscripten/emranlib libdatachannel-wasm.a
