@@ -34,7 +34,7 @@ void Scene::draw() {
 						SDL_->set_pixel(x, y, (*COLORS_)[same]);
 				}
 			} else {
-				SDL_->set_pixel(x, y, 0);
+				SDL_->set_pixel(x, y, (*COLORS_)[NOTHING]);
 			}
 		}
 	}

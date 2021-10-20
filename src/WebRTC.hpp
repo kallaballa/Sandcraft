@@ -106,7 +106,7 @@ public:
 	}
 
 	bool isOpen() {
-		return is_open;
+		return is_open && dc_->isOpen();
 	}
 };
 

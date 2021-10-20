@@ -239,6 +239,12 @@ void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
 		tick++;
 		t2 = AG_GetTicks();
 		if (t2 - t1 >= 1000 / 60) {
+			if (NEXUS != nullptr && NEXUS->isOpen()) {
+				(*COLORS)[NOTHING] = 0x00000000;
+			} else {
+				(*COLORS)[NOTHING] = 0xFF111111;
+			}
+
 			if (NEXUS != nullptr && GameState::getInstance().isHost_ && NEXUS->isOpen()) {
 				for (uint16_t y = 0; y < cfg.height_; ++y) {
 					NEXUS->sendParticleRow(y, *PARTICLES);

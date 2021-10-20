@@ -5,7 +5,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <zstr.hpp>
+#include <zlib.h>
 #include "../../SandcraftServer/src/Message.hpp"
 #include "Utils.hpp"
 #include "GameState.hpp"
