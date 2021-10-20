@@ -125,7 +125,7 @@ void Slots::process_events() {
 		if (gs.mouse_down_) {
 			auto mme = dev.data.motion;
 //			std::cout << "motion:" << gs.oldx_ << ':' << gs.oldy_ << ':' << mme.x <<  ':' << mme.y << std::endl;
-			if(gs.isHost)
+			if(gs.isHost_)
 				PARTICLES->drawLine(gs.oldx_, gs.oldy_, mme.x, mme.y);
 			else
 				PARTICLES->triggerLineEvent(gs.oldx_, gs.oldy_, mme.x, mme.y);

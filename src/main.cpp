@@ -59,11 +59,11 @@ void init() {
 		cfg.btn_lower_row_y_ = cfg.height_ - cfg.btn_size_ - 4;
 		cfg.dboard_height_ = cfg.btn_size_ + 8;
 
-		NEXUS = new P2P("localhost", cfg.port_);
+		NEXUS = new P2P("phokis.at", cfg.port_);
 		NEXUS->initRTC(
 				[&](std::vector<byte> data) {
 					if(NEXUS != nullptr && NEXUS->isOpen()) {
-						if(!GameState::getInstance().isHost) {
+						if(!GameState::getInstance().isHost_) {
 							const char* msgdata = (const char*)data.data();
 							long decompLen = sizeof(ParticleType) * cfg.width_ + 2;
 							static char* decomp = new char[decompLen];
@@ -100,7 +100,7 @@ void init() {
 		PARTICLES =
 				new Particles(
 						[&](int newx, int newy, int oldx, int oldy, ParticleType type) {
-							if(NEXUS != nullptr && !GameState::getInstance().isHost && NEXUS->isOpen()) {
+							if(NEXUS != nullptr && !GameState::getInstance().isHost_ && NEXUS->isOpen()) {
 //								std::cerr << "sendLine" << std::endl;
 								NEXUS->sendLine(newx, newy, oldx, oldy, type, GameState::getInstance().penSize_);
 							}
@@ -238,8 +238,8 @@ void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
 	try {
 		tick++;
 		t2 = AG_GetTicks();
-		if (t2 - t1 >= 1000 / 24) {
-			if (NEXUS != nullptr && GameState::getInstance().isHost && NEXUS->isOpen()) {
+		if (t2 - t1 >= 1000 / 60) {
+			if (NEXUS != nullptr && GameState::getInstance().isHost_ && NEXUS->isOpen()) {
 				for (uint16_t y = 0; y < cfg.height_; ++y) {
 					NEXUS->sendParticleRow(y, *PARTICLES);
 				}

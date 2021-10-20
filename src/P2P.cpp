@@ -116,15 +116,46 @@ EM_BOOL web_socket_message(int eventType,
 			auto lines = split(str, '\n');
 			std::cerr << lines.size() << std::endl;
 			assert(!lines.empty());
-			if (lines.size() == 1) {
+			bool found = false;
+			std::string selSDP, selRoom;
+			for (size_t i = 1; i < lines.size(); ++i) {
+				auto tokens = split(lines[i], ' ');
+				assert(tokens.size() == 4);
+				string sdp = tokens[0];
+				selSDP = base64_decode(sdp);
+				selRoom = tokens[1];
+				size_t max = stoi(tokens[2]);
+				size_t participants = stoi(tokens[3]);
+				if (participants < max) {
+					P2P::rtc_->init(
+							[=](Description desc) {
+								GameState::getInstance().isHost_ = false;
+								Message m(JOIN, {base64_encode(desc.operator string()), string("name-") + utils::random_id(32), selRoom});
+								std::stringstream ss;
+								m.write(ss);
+								emscripten_websocket_send_utf8_text(e->socket, ss.str().c_str());
+							},
+							[=](Candidate candidate) {
+								Message m(CLIENT, {base64_encode(candidate), base64_encode(candidate.mid())});
+								std::stringstream ss;
+								m.write(ss);
+								std::cerr << "SEND CLIENT" << std::endl;
+								emscripten_websocket_send_utf8_text(e->socket, ss.str().c_str());
+							});
+					found = true;
+					break;
+				}
+			}
+
+			if (!found) {
 				P2P::rtc_->init(
 						[=](Description desc) {
 							GameState& gs = GameState::getInstance();
-							if(gs.isHost)
-								return;
-							gs.isHost = true;
+							if(gs.isHost_)
+							return;
+							gs.isHost_ = true;
 							string sdp = base64_encode(desc);
-							Message m(CREATE, {sdp, string("room-") + utils::random_id(32), "4"});
+							Message m(CREATE, {sdp, string("room-") + utils::random_id(32), "1"});
 							std::stringstream ss;
 							m.write(ss);
 							emscripten_websocket_send_utf8_text(e->socket, ss.str().c_str());
@@ -134,39 +165,11 @@ EM_BOOL web_socket_message(int eventType,
 							hostCandidate.push_back( {candidate, candidate.mid()});
 						});
 				if (!is_init) {
-					P2P::rtc_->dc_ = P2P::rtc_->pc_->createDataChannel("test");
+					P2P::rtc_->dc_ = P2P::rtc_->pc_->createDataChannel(
+							"test");
 				}
 				is_init = true;
 			} else {
-				std::string selSDP, selRoom;
-				for (size_t i = 1; i < lines.size(); ++i) {
-					auto tokens = split(lines[i], ' ');
-					assert(tokens.size() == 4);
-					string sdp = tokens[0];
-					selSDP = base64_decode(sdp);
-					selRoom = tokens[1];
-					size_t max = stoi(tokens[2]);
-					size_t participants = stoi(tokens[3]);
-					if (participants < max) {
-						P2P::rtc_->init(
-								[=](Description desc) {
-									GameState::getInstance().isHost = false;
-									Message m(JOIN, {base64_encode(desc.operator string()), string("name-") + utils::random_id(32), selRoom});
-									std::stringstream ss;
-									m.write(ss);
-									emscripten_websocket_send_utf8_text(e->socket, ss.str().c_str());
-								},
-								[=](Candidate candidate) {
-									Message m(CLIENT, {base64_encode(candidate), base64_encode(candidate.mid())});
-									std::stringstream ss;
-									m.write(ss);
-									std::cerr << "SEND CLIENT" << std::endl;
-									emscripten_websocket_send_utf8_text(e->socket, ss.str().c_str());
-								});
-						break;
-					}
-				}
-
 				P2P::rtc_->answer(Description(selSDP, "answer"));
 			}
 		} else if (startsWith(str, "negotiate")) {
@@ -222,7 +225,7 @@ P2P::P2P(string host, int port) {
 	EmscriptenWebSocketCreateAttributes attr;
 	emscripten_websocket_init_create_attributes(&attr);
 
-	attr.url = (std::string("ws://") + host + ":" + std::to_string(port)
+	attr.url = (std::string("wss://") + host + ":" + std::to_string(port)
 			+ "/sandcraft").c_str();
 
 	EMSCRIPTEN_WEBSOCKET_T socket = emscripten_websocket_new(&attr);

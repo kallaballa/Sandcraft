@@ -586,7 +586,7 @@ void Particles::updateVirtualScreen() {
 		// Due to biasing when iterating through the scanline from left to right,
 		// we now chose our direction randomly per scanline.
 		if (utils::rand() % 2 == 0)
-			for (int x = config_.width_ - 2; x--;)
+ 			for (int x = config_.width_ - 2; x--;)
 				updateVirtualPixel(x, y);
 		else
 			for (int x = 1; x < config_.width_ - 1; x++)
@@ -623,7 +623,6 @@ void Particles::logic() {
 			lineQ_.pop();
 		}
 	}
-
 	//Clear bottom line
 	for (int i = 0; i < cfg.width_; i++)
 		(*this)[i + ((cfg.height_ - cfg.dboard_height_ - 1) * cfg.width_)] =
@@ -631,6 +630,7 @@ void Particles::logic() {
 	//Clear top line
 	for (int i = 0; i < cfg.width_; i++)
 		(*this)[i + ((0) * cfg.width_)] = NOTHING;
+
 	updateVirtualScreen();
 }
 
