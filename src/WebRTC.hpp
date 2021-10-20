@@ -21,7 +21,8 @@ class WebRTC {
 private:
 	Configuration config_;
 	std::function<void(std::vector<byte>)> cbMsg_;
-	bool is_open = false;
+	bool isOpen_ = false;
+	bool isClosed_ = false;
 public:
 	shared_ptr<DataChannel> dc_ = nullptr;
 	shared_ptr<PeerConnection> pc_ = nullptr;
@@ -41,7 +42,11 @@ public:
 		});
 
 		pc_->onStateChange(
-		    [](PeerConnection::State state) { cout << "[State: " << (int)state << "]" << endl; });
+		    [&](PeerConnection::State state) {
+			cout << "[State: " << (int)state << "]" << endl;
+			if((int)state > 2)
+				isClosed_ = true;
+		});
 		pc_->onGatheringStateChange([](PeerConnection::GatheringState state) {
 			cout << "[Gathering State: " << (int)state << "]" << endl;
 		});
@@ -52,19 +57,20 @@ public:
 		std::cerr << "ANSWER: " << std::endl;
 
 		pc_->onDataChannel([&](shared_ptr<DataChannel> _dc) {
-			is_open = false;
+			isOpen_ = false;
 
 			cout << "[Got a DataChannel with label: " << _dc->label() << "]" << endl;
 			dc_ = _dc;
 
 			dc_->onOpen([&]() {
 				cout << "[DataChannel open: " << dc_->label() << "]" << endl;
-				is_open = true;
+				isOpen_ = true;
 			});
 
 			dc_->onClosed([&]() {
 				cout << "[DataChannel closed: " << dc_->label() << "]" << endl;
-				is_open = false;
+				isOpen_ = false;
+				isClosed_ = true;
 			});
 
 			dc_->onMessage([&](variant<binary, string> message) {
@@ -82,12 +88,13 @@ public:
 		std::cerr << "OFFER: " << std::endl;
 		dc_->onOpen([&]() {
 			cout << "[DataChannel open: " << dc_->label() << "]" << endl;
-			is_open = true;
+			isOpen_ = true;
 		});
 
 		dc_->onClosed([&]() {
 			cout << "[DataChannel closed: " << dc_->label() << "]" << endl;
-			is_open = false;
+			isOpen_ = false;
+			isClosed_ = true;
 		});
 
 		dc_->onMessage([&](variant<binary, string> message) {
@@ -106,7 +113,11 @@ public:
 	}
 
 	bool isOpen() {
-		return is_open && dc_->isOpen();
+		return isOpen_ && dc_->isOpen();
+	}
+
+	bool isClosed() {
+		return isClosed_;
 	}
 };
 

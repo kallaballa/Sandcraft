@@ -85,6 +85,9 @@ EM_BOOL web_socket_open(int eventType, const EmscriptenWebSocketOpenEvent *e,
 
 EM_BOOL web_socket_close(int eventType, const EmscriptenWebSocketCloseEvent *e,
 		void *userData) {
+
+	P2P::isClosed_ = true;
+
 	printf(
 			"close(eventType=%d, wasClean=%d, code=%d, reason=%s, userData=%ld)\n",
 			eventType, e->wasClean, e->code, e->reason, (long) userData);
@@ -215,8 +218,14 @@ EM_BOOL web_socket_message(int eventType,
 }
 
 WebRTC* P2P::rtc_ = nullptr;
+bool P2P::isClosed_ = false;
+EMSCRIPTEN_WEBSOCKET_T P2P::socket_ = 0;
 
 P2P::P2P(string host, int port) {
+	rtc_ = nullptr;
+	isClosed_ = false;
+	socket_ = 0;
+
 	if (!emscripten_websocket_is_supported()) {
 		printf("WebSockets are not supported, cannot continue!\n");
 		exit(1);
@@ -228,25 +237,29 @@ P2P::P2P(string host, int port) {
 	attr.url = (std::string("wss://") + host + ":" + std::to_string(port)
 			+ "/sandcraft").c_str();
 
-	EMSCRIPTEN_WEBSOCKET_T socket = emscripten_websocket_new(&attr);
-	if (socket <= 0) {
+	socket_ = emscripten_websocket_new(&attr);
+	if (socket_ <= 0) {
 		printf("WebSocket creation failed, error code %d!\n",
-				(EMSCRIPTEN_RESULT) socket);
+				(EMSCRIPTEN_RESULT) socket_);
 		exit(1);
 	}
 
-	emscripten_websocket_set_onopen_callback(socket, (void* )42,
+	emscripten_websocket_set_onopen_callback(socket_, (void* )42,
 			web_socket_open);
-	emscripten_websocket_set_onclose_callback(socket, (void* )43,
+	emscripten_websocket_set_onclose_callback(socket_, (void* )43,
 			web_socket_close);
-	emscripten_websocket_set_onerror_callback(socket, (void* )44,
+	emscripten_websocket_set_onerror_callback(socket_, (void* )44,
 			web_socket_error);
-	emscripten_websocket_set_onmessage_callback(socket, (void* )45,
+	emscripten_websocket_set_onmessage_callback(socket_, (void* )45,
 			web_socket_message);
 }
 
 P2P::~P2P() {
-	// TODO Auto-generated destructor stub
+	if(rtc_ != nullptr)
+		delete rtc_;
+	if(socket_ > 0) {
+		emscripten_websocket_close(socket_, 1000, "reinit");
+	}
 }
 
 void P2P::initRTC(std::function<void(std::vector<byte>)> recvCallback) {

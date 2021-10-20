@@ -10,8 +10,9 @@ namespace sandcraft {
 
 class P2P {
 public:
+	static bool isClosed_;
 	static WebRTC* rtc_;
-
+	static EMSCRIPTEN_WEBSOCKET_T socket_;
 
 	P2P(string host, int port);
 	virtual ~P2P();
@@ -19,8 +20,12 @@ public:
 	void sendParticleRow(uint16_t y, Particles& particles);
 	void sendLine(int newX, int newY, int oldX, int oldY, ParticleType type, int penSize);
 
+	bool isClosed() {
+		return isClosed_ || (rtc_ != nullptr && rtc_->isClosed());
+	}
+
 	bool isOpen() {
-		return rtc_ != nullptr && rtc_->isOpen();
+		return !isClosed() && rtc_ != nullptr && rtc_->isOpen();
 	}
 
 };

@@ -50,6 +50,57 @@ Buttons* BUTTONS = nullptr;
 std::thread* EVTHREAD = nullptr;
 AG_Driver* DRV = nullptr;
 P2P* NEXUS = nullptr;
+
+void initNexus() {
+	std::cerr << "init nexus" << std::endl;
+	Config& cfg = Config::getInstance();
+	if(NEXUS != nullptr) {
+		auto copy = NEXUS;
+		NEXUS = nullptr;
+		std::this_thread::sleep_for(1s);
+		delete copy;
+	}
+
+	NEXUS = new P2P("phokis.at", cfg.port_);
+	NEXUS->initRTC(
+			[&](std::vector<byte> data) {
+				if(NEXUS != nullptr && NEXUS->isOpen()) {
+					if(!GameState::getInstance().isHost_) {
+						const char* msgdata = (const char*)data.data();
+						long decompLen = sizeof(ParticleType) * cfg.width_ + 2;
+						static char* decomp = new char[decompLen];
+
+						z_stream infstream;
+						z_stream defstream;
+						infstream.zalloc = Z_NULL;
+						infstream.zfree = Z_NULL;
+						infstream.opaque = Z_NULL;
+						// setup "b" as the input and "c" as the compressed output
+						infstream.avail_in = (uInt)data.size();
+						infstream.next_in = (Bytef *)msgdata;// input char array
+						infstream.avail_out = (uInt)decompLen;// size of output
+						infstream.next_out = (Bytef *)decomp;// output char array
+						inflateInit(&infstream);
+						inflate(&infstream, Z_NO_FLUSH);
+						inflateEnd(&infstream);
+//						    std::cerr << strlen(msgdata) << ":" << decompLen << std::endl;
+						uint16_t y = (*(uint16_t*)decomp);
+						memcpy(PARTICLES->vs_ + (cfg.width_ * y), decomp + 2, decompLen - 2);
+					} else {
+						assert(data.size() == 12);
+						const uint16_t* msgdata = (const uint16_t*)data.data();
+//							std::cout << msgdata[0] << ':' << msgdata[1] << ':' << msgdata[2] <<  ':' << msgdata[3] << std::endl;
+						if(PARTICLES != nullptr) {
+//								std::cout << "draw" << std::endl;
+							PARTICLES->drawLine(msgdata[0], msgdata[1], msgdata[2], msgdata[3],(ParticleType)msgdata[4], msgdata[5]);
+						}
+					}
+				} else {
+					std::cerr << "dropped" << std::endl;
+				}
+			});
+}
+
 void init() {
 	std::cerr << string("init") << std::endl;
 	try {
@@ -59,44 +110,7 @@ void init() {
 		cfg.btn_lower_row_y_ = cfg.height_ - cfg.btn_size_ - 4;
 		cfg.dboard_height_ = cfg.btn_size_ + 8;
 
-		NEXUS = new P2P("phokis.at", cfg.port_);
-		NEXUS->initRTC(
-				[&](std::vector<byte> data) {
-					if(NEXUS != nullptr && NEXUS->isOpen()) {
-						if(!GameState::getInstance().isHost_) {
-							const char* msgdata = (const char*)data.data();
-							long decompLen = sizeof(ParticleType) * cfg.width_ + 2;
-							static char* decomp = new char[decompLen];
-
-							z_stream infstream;
-							z_stream defstream;
-							infstream.zalloc = Z_NULL;
-							infstream.zfree = Z_NULL;
-							infstream.opaque = Z_NULL;
-							// setup "b" as the input and "c" as the compressed output
-							infstream.avail_in = (uInt)data.size();
-							infstream.next_in = (Bytef *)msgdata;// input char array
-							infstream.avail_out = (uInt)decompLen;// size of output
-							infstream.next_out = (Bytef *)decomp;// output char array
-							inflateInit(&infstream);
-							inflate(&infstream, Z_NO_FLUSH);
-							inflateEnd(&infstream);
-//						    std::cerr << strlen(msgdata) << ":" << decompLen << std::endl;
-							uint16_t y = (*(uint16_t*)decomp);
-							memcpy(PARTICLES->vs_ + (cfg.width_ * y), decomp + 2, decompLen - 2);
-						} else {
-							assert(data.size() == 12);
-							const uint16_t* msgdata = (const uint16_t*)data.data();
-//							std::cout << msgdata[0] << ':' << msgdata[1] << ':' << msgdata[2] <<  ':' << msgdata[3] << std::endl;
-							if(PARTICLES != nullptr) {
-//								std::cout << "draw" << std::endl;
-								PARTICLES->drawLine(msgdata[0], msgdata[1], msgdata[2], msgdata[3],(ParticleType)msgdata[4], msgdata[5]);
-							}
-						}
-					} else {
-						std::cerr << "dropped" << std::endl;
-					}
-				});
+		initNexus();
 		PARTICLES =
 				new Particles(
 						[&](int newx, int newy, int oldx, int oldy, ParticleType type) {
@@ -239,7 +253,11 @@ void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
 		tick++;
 		t2 = AG_GetTicks();
 		if (t2 - t1 >= 1000 / 60) {
-			if (NEXUS != nullptr && NEXUS->isOpen()) {
+			if (NEXUS != nullptr && NEXUS->isClosed()) {
+				(*COLORS)[NOTHING] = 0xFF0000FF;
+				initNexus();
+				std::this_thread::sleep_for(1s);
+			} else if (NEXUS != nullptr && NEXUS->isOpen()) {
 				(*COLORS)[NOTHING] = 0x00000000;
 			} else {
 				(*COLORS)[NOTHING] = 0xFF111111;
