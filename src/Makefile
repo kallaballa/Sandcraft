@@ -8,11 +8,11 @@ ifdef JAVASCRIPT_MT
 TARGET := sandcraft.js
 endif
 
-SRCS  := main.cpp CmdLine.cpp Palette.cpp Config.cpp GameState.cpp Particles.cpp Renderer.cpp SDLHelper.cpp Utils.cpp Scene.cpp Error.cpp Slots.cpp P2P.cpp WebRTC.cpp
+SRCS  := main.cpp CmdLine.cpp Palette.cpp Config.cpp GameState.cpp Particles.cpp Renderer.cpp SDLHelper.cpp Utils.cpp Scene.cpp Error.cpp Slots.cpp Nexus.cpp WebRTC.cpp Logger.cpp
 
 
 ifndef AMIGA
-CXXFLAGS += `pkg-config --cflags sdl` `agar-config --cflags` -I../third/zstr/src/
+CXXFLAGS += `pkg-config --cflags sdl` `agar-config --cflags` -I../third/
 LIBS += `pkg-config --libs sdl` `agar-config --libs`
 else
 LIBS += -lSDL -ldebug
@@ -21,15 +21,16 @@ endif
 ifndef AMIGA
 ifndef JAVASCRIPT
 ifndef JAVASCRIPT_MT
-CXXFLAGS += `pkg-config --cflags SDL_image x11 freetype2 fontconfig libpng`
-LIBS += `pkg-config --libs SDL_image x11 freetype2 fontconfig libpng`
+CXXFLAGS += `pkg-config --cflags SDL_image x11 freetype2 fontconfig libpng` -I../third/libdatachannel/include/
+LIBS += `pkg-config --libs SDL_image x11 freetype2 fontconfig libpng` -ldatachannel
+LDFLAGS += -L../third/libdatachannel/build/
 endif
 endif
 endif
 
 ifdef JAVASCRIPT_MT
 LDFLAGS += --js-library ../third/datachannel-wasm/wasm/js/webrtc.js
-LIBS += -ldatachannel-wasm -lwebsocket.js
+LIBS += -ldatachannel-wasm -lwebsocket.js 
 endif
 
 #precompiled headers

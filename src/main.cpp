@@ -1,3 +1,4 @@
+
 #ifdef WIN32
 #pragma comment(lib, "SDL.lib")
 #pragma comment(lib, "SDLmain.lib")
@@ -28,8 +29,9 @@
 #include "Scene.hpp"
 #include "Error.hpp"
 #include "Slots.hpp"
-#include "P2P.hpp"
+#include "Nexus.hpp"
 #include "WebRTC.hpp"
+#include "Logger.hpp"
 
 
 #ifdef __EMSCRIPTEN__
@@ -49,60 +51,31 @@ AG_Window* DASHWND = nullptr;
 Buttons* BUTTONS = nullptr;
 std::thread* EVTHREAD = nullptr;
 AG_Driver* DRV = nullptr;
-P2P* NEXUS = nullptr;
-
+Nexus* NEXUS = nullptr;
+std::mutex INIT_NEXUS_MTX;
 void initNexus() {
-	std::cerr << "init nexus" << std::endl;
+	std::unique_lock<std::mutex> lock(INIT_NEXUS_MTX);
+	log_info("Init Nexus");
 	Config& cfg = Config::getInstance();
 	if(NEXUS != nullptr) {
-		auto copy = NEXUS;
-		NEXUS = nullptr;
-		std::this_thread::sleep_for(1s);
-		delete copy;
+		delete NEXUS;
 	}
 
-	NEXUS = new P2P("phokis.at", cfg.port_);
+	NEXUS = new Nexus("phokis.at", cfg.port_);
 	NEXUS->initRTC(
 			[&](std::vector<byte> data) {
 				if(NEXUS != nullptr && NEXUS->isOpen()) {
 					if(!GameState::getInstance().isHost_) {
-						const char* msgdata = (const char*)data.data();
-						long decompLen = sizeof(ParticleType) * cfg.width_ + 2;
-						static char* decomp = new char[decompLen];
-
-						z_stream infstream;
-						z_stream defstream;
-						infstream.zalloc = Z_NULL;
-						infstream.zfree = Z_NULL;
-						infstream.opaque = Z_NULL;
-						// setup "b" as the input and "c" as the compressed output
-						infstream.avail_in = (uInt)data.size();
-						infstream.next_in = (Bytef *)msgdata;// input char array
-						infstream.avail_out = (uInt)decompLen;// size of output
-						infstream.next_out = (Bytef *)decomp;// output char array
-						inflateInit(&infstream);
-						inflate(&infstream, Z_NO_FLUSH);
-						inflateEnd(&infstream);
-//						    std::cerr << strlen(msgdata) << ":" << decompLen << std::endl;
-						uint16_t y = (*(uint16_t*)decomp);
-						memcpy(PARTICLES->vs_ + (cfg.width_ * y), decomp + 2, decompLen - 2);
+						NEXUS->receiveParticles(data, PARTICLES);
 					} else {
-						assert(data.size() == 12);
-						const uint16_t* msgdata = (const uint16_t*)data.data();
-//							std::cout << msgdata[0] << ':' << msgdata[1] << ':' << msgdata[2] <<  ':' << msgdata[3] << std::endl;
-						if(PARTICLES != nullptr) {
-//								std::cout << "draw" << std::endl;
-							PARTICLES->drawLine(msgdata[0], msgdata[1], msgdata[2], msgdata[3],(ParticleType)msgdata[4], msgdata[5]);
-						}
+						NEXUS->receiveDrawLine(data, PARTICLES);
 					}
-				} else {
-					std::cerr << "dropped" << std::endl;
 				}
 			});
 }
 
 void init() {
-	std::cerr << string("init") << std::endl;
+	log_info("Initializing");
 	try {
 		Config& cfg = Config::getInstance();
 		cfg.btn_upper_row_y_ = cfg.height_ - cfg.btn_size_ - 4;
@@ -115,8 +88,7 @@ void init() {
 				new Particles(
 						[&](int newx, int newy, int oldx, int oldy, ParticleType type) {
 							if(NEXUS != nullptr && !GameState::getInstance().isHost_ && NEXUS->isOpen()) {
-//								std::cerr << "sendLine" << std::endl;
-								NEXUS->sendLine(newx, newy, oldx, oldy, type, GameState::getInstance().penSize_);
+								NEXUS->sendDrawLine(newx, newy, oldx, oldy, type, GameState::getInstance().penSize_);
 							}
 						});
 		SDL = new SDLHelper();
@@ -194,12 +166,13 @@ void init() {
 		event::Slots::init(DRV, DASHWND, PARTICLES, BUTTONS);
 		EVTHREAD = new std::thread([&]() {
 			while(true) {
+				std::unique_lock<std::mutex> lock(INIT_NEXUS_MTX);
 				event::Slots::process_events();
 				std::this_thread::yield();
 			}
 		});
 	} catch (std::exception& ex) {
-		std::cerr << ex.what() << std::endl;
+		log_error("Exception", ex.what());
 	}
 	GameState::getInstance().done_ = 0;
 	std::cerr << "loaded" << std::endl;
@@ -240,7 +213,7 @@ void step() {
 	try {
 		STEP_FUNC();
 	} catch (std::exception& ex) {
-		std::cerr << ex.what() << std::endl;
+		log_error("Exception", ex.what());
 	}
 }
 
@@ -256,7 +229,6 @@ void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
 			if (NEXUS != nullptr && NEXUS->isClosed()) {
 				(*COLORS)[NOTHING] = 0xFF0000FF;
 				initNexus();
-				std::this_thread::sleep_for(1s);
 			} else if (NEXUS != nullptr && NEXUS->isOpen()) {
 				(*COLORS)[NOTHING] = 0x00000000;
 			} else {
@@ -264,9 +236,10 @@ void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
 			}
 
 			if (NEXUS != nullptr && GameState::getInstance().isHost_ && NEXUS->isOpen()) {
-				for (uint16_t y = 0; y < cfg.height_; ++y) {
-					NEXUS->sendParticleRow(y, *PARTICLES);
-				}
+				NEXUS->sendParticles(*PARTICLES);
+//				for (uint16_t y = 0; y < cfg.height_; ++y) {
+//					NEXUS->sendParticleRow(y, *PARTICLES);
+//				}
 			}
 
 			if (SDL_MUSTLOCK(SDL->screen_)) {
@@ -293,17 +266,24 @@ void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
 		}
 		AG_ProcessTimeouts(t2);
 		PARTICLES->logic();
+	} catch (std::exception& ex) {
+		log_error("Exception", ex.what());
 	} catch (...) {
-		std::cerr << "exception" << std::endl;
+		log_error("Unknown exception");
 	}
-
+	std::this_thread::yield();
 }
+
 int main(int argc, char **argv) {
 	using namespace sandcraft;
 #ifndef __EMSCRIPTEN__
 	XInitThreads();
 #endif
-	ErrorHandler::init(default_error_delegate);
+	Logger::init(L_DEBUG);
+	ErrorHandler::init([](const string& msg){
+		log_error("Error", msg);
+	});
+
 	if (AG_InitCore(NULL, AG_SOFT_TIMERS) == -1)
 		return 2;
 

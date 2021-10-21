@@ -1,5 +1,5 @@
-#ifndef SRC_P2P_HPP_
-#define SRC_P2P_HPP_
+#ifndef SRC_NEXUS_HPP_
+#define SRC_NEXUS_HPP_
 
 #include <string>
 #include <emscripten/websocket.h>
@@ -8,17 +8,21 @@
 
 namespace sandcraft {
 
-class P2P {
+class Nexus {
 public:
 	static bool isClosed_;
 	static WebRTC* rtc_;
 	static EMSCRIPTEN_WEBSOCKET_T socket_;
 
-	P2P(string host, int port);
-	virtual ~P2P();
+	Nexus(string host, int port);
+	virtual ~Nexus();
 	void initRTC(std::function<void(std::vector<byte>)> recvCallback);
+	void receiveParticles(const std::vector<byte>& data, Particles* particles);
+	void sendParticles(Particles& particles);
 	void sendParticleRow(uint16_t y, Particles& particles);
-	void sendLine(int newX, int newY, int oldX, int oldY, ParticleType type, int penSize);
+	void receiveParticleRow(const std::vector<byte>& data, Particles* particles);
+	void sendDrawLine(int newX, int newY, int oldX, int oldY, ParticleType type, int penSize);
+	void receiveDrawLine(const std::vector<byte>& data, Particles* particles);
 
 	bool isClosed() {
 		return isClosed_ || (rtc_ != nullptr && rtc_->isClosed());
@@ -32,4 +36,4 @@ public:
 
 } /* namespace scserver */
 
-#endif /* SRC_P2P_HPP_ */
+#endif /* SRC_NEXUS_HPP_ */

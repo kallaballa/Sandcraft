@@ -1,4 +1,4 @@
-#include "P2P.hpp"
+#include "Nexus.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -9,7 +9,7 @@
 #include "../../SandcraftServer/src/Message.hpp"
 #include "Utils.hpp"
 #include "GameState.hpp"
-
+#include "Logger.hpp"
 
 namespace sandcraft {
 
@@ -86,11 +86,13 @@ EM_BOOL web_socket_open(int eventType, const EmscriptenWebSocketOpenEvent *e,
 EM_BOOL web_socket_close(int eventType, const EmscriptenWebSocketCloseEvent *e,
 		void *userData) {
 
-	P2P::isClosed_ = true;
+	if(Nexus::socket_ > 0)  {
+		Nexus::isClosed_ = true;
 
 	printf(
 			"close(eventType=%d, wasClean=%d, code=%d, reason=%s, userData=%ld)\n",
 			eventType, e->wasClean, e->code, e->reason, (long) userData);
+	}
 	return 0;
 }
 
@@ -113,11 +115,10 @@ EM_BOOL web_socket_message(int eventType,
 		printf("text data: \"%s\"\n", e->data);
 		std::string str((const char*) e->data);
 		if (startsWith(str, "Error:")) {
-			std::cerr << str << std::endl;
+			log_error("Received error", str);
 			exit(1);
 		} else if (startsWith(str, "list")) {
 			auto lines = split(str, '\n');
-			std::cerr << lines.size() << std::endl;
 			assert(!lines.empty());
 			bool found = false;
 			std::string selSDP, selRoom;
@@ -130,7 +131,7 @@ EM_BOOL web_socket_message(int eventType,
 				size_t max = stoi(tokens[2]);
 				size_t participants = stoi(tokens[3]);
 				if (participants < max) {
-					P2P::rtc_->init(
+					Nexus::rtc_->init(
 							[=](Description desc) {
 								GameState::getInstance().isHost_ = false;
 								Message m(JOIN, {base64_encode(desc.operator string()), string("name-") + utils::random_id(32), selRoom});
@@ -142,7 +143,7 @@ EM_BOOL web_socket_message(int eventType,
 								Message m(CLIENT, {base64_encode(candidate), base64_encode(candidate.mid())});
 								std::stringstream ss;
 								m.write(ss);
-								std::cerr << "SEND CLIENT" << std::endl;
+								log_info("send client candidate", candidate);
 								emscripten_websocket_send_utf8_text(e->socket, ss.str().c_str());
 							});
 					found = true;
@@ -151,7 +152,7 @@ EM_BOOL web_socket_message(int eventType,
 			}
 
 			if (!found) {
-				P2P::rtc_->init(
+				Nexus::rtc_->init(
 						[=](Description desc) {
 							GameState& gs = GameState::getInstance();
 							if(gs.isHost_)
@@ -164,16 +165,16 @@ EM_BOOL web_socket_message(int eventType,
 							emscripten_websocket_send_utf8_text(e->socket, ss.str().c_str());
 						},
 						[&](Candidate candidate) {
-							std::cerr << "SET CANDIDATE" << std::endl;
+							log_info("add local candidate", candidate);
 							hostCandidate.push_back( {candidate, candidate.mid()});
 						});
 				if (!is_init) {
-					P2P::rtc_->dc_ = P2P::rtc_->pc_->createDataChannel(
+					Nexus::rtc_->dc_ = Nexus::rtc_->pc_->createDataChannel(
 							"test");
 				}
 				is_init = true;
 			} else {
-				P2P::rtc_->answer(Description(selSDP, "answer"));
+				Nexus::rtc_->answer(Description(selSDP, "answer"));
 			}
 		} else if (startsWith(str, "negotiate")) {
 			for (auto& p : hostCandidate) {
@@ -184,26 +185,26 @@ EM_BOOL web_socket_message(int eventType,
 				m.write(ss);
 				emscripten_websocket_send_utf8_text(e->socket,
 						ss.str().c_str());
-				std::cerr << "SEND HOST:" << p.first << std::endl;
+				log_info("send host candidate", p.first);
 			}
 			auto tokens = split(str, ' ');
 			assert(tokens.size() == 4);
 			string sdp = base64_decode(tokens[1]);
-			P2P::rtc_->offer(Description(sdp, "offer"));
+			Nexus::rtc_->offer(Description(sdp, "offer"));
 		} else if (startsWith(str, "client")) {
 			auto tokens = split(str, ' ');
 			assert(tokens.size() == 3);
 			string cand = base64_decode(tokens[1]);
 			string mid = base64_decode(tokens[2]);
-			std::cerr << "add client" << cand << " " << mid << std::endl;
-			P2P::rtc_->pc_->addRemoteCandidate(Candidate(cand, mid));
+			log_info("add remote candidate (client)", cand);
+			Nexus::rtc_->pc_->addRemoteCandidate(Candidate(cand, mid));
 		} else if (startsWith(str, "host")) {
 			auto tokens = split(str, ' ');
 			assert(tokens.size() == 3);
 			string cand = base64_decode(tokens[1]);
 			string mid = base64_decode(tokens[2]);
-			std::cerr << "add host" << cand << " " << mid << std::endl;
-			P2P::rtc_->pc_->addRemoteCandidate(Candidate(cand, mid));
+			log_info("add remote candidate (host)", cand);
+			Nexus::rtc_->pc_->addRemoteCandidate(Candidate(cand, mid));
 		}
 	} else {
 		printf("binary data:");
@@ -217,11 +218,11 @@ EM_BOOL web_socket_message(int eventType,
 	return 0;
 }
 
-WebRTC* P2P::rtc_ = nullptr;
-bool P2P::isClosed_ = false;
-EMSCRIPTEN_WEBSOCKET_T P2P::socket_ = 0;
+WebRTC* Nexus::rtc_ = nullptr;
+bool Nexus::isClosed_ = false;
+EMSCRIPTEN_WEBSOCKET_T Nexus::socket_ = 0;
 
-P2P::P2P(string host, int port) {
+Nexus::Nexus(string host, int port) {
 	rtc_ = nullptr;
 	isClosed_ = false;
 	socket_ = 0;
@@ -234,8 +235,9 @@ P2P::P2P(string host, int port) {
 	EmscriptenWebSocketCreateAttributes attr;
 	emscripten_websocket_init_create_attributes(&attr);
 
-	attr.url = (std::string("wss://") + host + ":" + std::to_string(port)
-			+ "/sandcraft").c_str();
+	string url = (std::string("wss://") + host + ":" + std::to_string(port)
+	+ "/sandcraft");
+	attr.url = url.c_str();
 
 	socket_ = emscripten_websocket_new(&attr);
 	if (socket_ <= 0) {
@@ -254,25 +256,27 @@ P2P::P2P(string host, int port) {
 			web_socket_message);
 }
 
-P2P::~P2P() {
+Nexus::~Nexus() {
+	if(socket_ > 0) {
+		EMSCRIPTEN_WEBSOCKET_T copy = socket_;
+		socket_ = 0;
+		emscripten_websocket_delete(copy);
+	}
 	if(rtc_ != nullptr)
 		delete rtc_;
-	if(socket_ > 0) {
-		emscripten_websocket_close(socket_, 1000, "reinit");
-	}
 }
 
-void P2P::initRTC(std::function<void(std::vector<byte>)> recvCallback) {
+void Nexus::initRTC(std::function<void(std::vector<byte>)> recvCallback) {
 	rtc_ = new WebRTC(recvCallback);
 }
 
-void P2P::sendParticleRow(uint16_t y, Particles& particles) {
+void Nexus::sendParticles(Particles& particles) {
 	Config& cfg = Config::getInstance();
-	long inlen = cfg.width_ * sizeof(ParticleType);
-	const char *inrow = (const char*) (particles.vs_ + (y * cfg.width_));
+	long inlen = cfg.width_ * cfg.height_ * sizeof(ParticleType);
+	const char *inrow = (const char*) particles.vs_;
 	static char *message = new char[inlen + 2];
 	static char *compmsg = new char[inlen + 2];
-	(*(uint16_t*) message) = y;
+	(*(int16_t*) message) = -1;
 	memcpy(message + 2, inrow, inlen);
 
     z_stream defstream;
@@ -290,11 +294,86 @@ void P2P::sendParticleRow(uint16_t y, Particles& particles) {
     deflate(&defstream, Z_FINISH);
     deflateEnd(&defstream);
 
-//    std::cerr << inlen << ":" << strlen(compmsg) << std::endl;
 	rtc_->dc_->send((byte*) compmsg, defstream.total_out);
 }
 
-void P2P::sendLine(int newX, int newY, int oldX, int oldY, ParticleType type, int penSize) {
+void Nexus::sendParticleRow(uint16_t y, Particles& particles) {
+	Config& cfg = Config::getInstance();
+	long inlen = cfg.width_ * sizeof(ParticleType);
+	const char *inrow = (const char*) (particles.vs_ + (y * cfg.width_));
+	static char *message = new char[inlen + 2];
+	static char *compmsg = new char[inlen + 2];
+	(*(int16_t*) message) = y;
+	memcpy(message + 2, inrow, inlen);
+
+    z_stream defstream;
+    defstream.zalloc = Z_NULL;
+    defstream.zfree = Z_NULL;
+    defstream.opaque = Z_NULL;
+    // setup "a" as the input and "b" as the compressed output
+    defstream.avail_in = (uInt)inlen + 2; // size of input, string + terminator
+    defstream.next_in = (Bytef *)message; // input char array
+    defstream.avail_out = (uInt)inlen + 2; // size of output
+    defstream.next_out = (Bytef *)compmsg; // output char array
+
+    // the actual compression work.
+    deflateInit(&defstream, Z_BEST_SPEED);
+    deflate(&defstream, Z_FINISH);
+    deflateEnd(&defstream);
+
+	rtc_->dc_->send((byte*) compmsg, defstream.total_out);
+}
+
+void Nexus::receiveParticles(const std::vector<byte>& data, Particles* particles) {
+	Config& cfg = Config::getInstance();
+	const char* msgdata = (const char*)data.data();
+	long decompLen = sizeof(ParticleType) * cfg.width_ * cfg.height_ + 2;
+	static char* decomp = new char[decompLen];
+
+	z_stream infstream;
+	z_stream defstream;
+	infstream.zalloc = Z_NULL;
+	infstream.zfree = Z_NULL;
+	infstream.opaque = Z_NULL;
+	// setup "b" as the input and "c" as the compressed output
+	infstream.avail_in = (uInt)data.size();
+	infstream.next_in = (Bytef *)msgdata;// input char array
+	infstream.avail_out = (uInt)decompLen;// size of output
+	infstream.next_out = (Bytef *)decomp;// output char array
+	inflateInit(&infstream);
+	inflate(&infstream, Z_NO_FLUSH);
+	inflateEnd(&infstream);
+//						    std::cerr << strlen(msgdata) << ":" << decompLen << std::endl;
+	int16_t y = (*(int16_t*)decomp);
+	assert(y == -1);
+	memcpy(particles->vs_, decomp + 2, decompLen - 2);
+}
+
+void Nexus::receiveParticleRow(const std::vector<byte>& data, Particles* particles) {
+	Config& cfg = Config::getInstance();
+	const char* msgdata = (const char*)data.data();
+	long decompLen = sizeof(ParticleType) * cfg.width_ + 2;
+	static char* decomp = new char[decompLen];
+
+	z_stream infstream;
+	z_stream defstream;
+	infstream.zalloc = Z_NULL;
+	infstream.zfree = Z_NULL;
+	infstream.opaque = Z_NULL;
+	// setup "b" as the input and "c" as the compressed output
+	infstream.avail_in = (uInt)data.size();
+	infstream.next_in = (Bytef *)msgdata;// input char array
+	infstream.avail_out = (uInt)decompLen;// size of output
+	infstream.next_out = (Bytef *)decomp;// output char array
+	inflateInit(&infstream);
+	inflate(&infstream, Z_NO_FLUSH);
+	inflateEnd(&infstream);
+//						    std::cerr << strlen(msgdata) << ":" << decompLen << std::endl;
+	int16_t y = (*(int16_t*)decomp);
+	memcpy(particles->vs_ + (cfg.width_ * y), decomp + 2, decompLen - 2);
+}
+
+void Nexus::sendDrawLine(int newX, int newY, int oldX, int oldY, ParticleType type, int penSize) {
 	static uint16_t* msg = new uint16_t[6];
 	msg[0] = newX;
 	msg[1] = newY;
@@ -302,8 +381,14 @@ void P2P::sendLine(int newX, int newY, int oldX, int oldY, ParticleType type, in
 	msg[3] = oldY;
 	msg[4] = (uint16_t) type;
 	msg[5] = penSize;
-//	std::cerr << "really:" << rtc_->dc_->isOpen() << std::endl;
 	assert(rtc_->dc_->send((byte*) msg, 12));
 }
 
+void Nexus::receiveDrawLine(const std::vector<byte>& data, Particles* particles) {
+	assert(data.size() == 12);
+	const uint16_t* msgdata = (const uint16_t*)data.data();
+	if(particles != nullptr) {
+		particles->drawLine(msgdata[0], msgdata[1], msgdata[2], msgdata[3],(ParticleType)msgdata[4], msgdata[5]);
+	}
+}
 } /* namespace scserver */

@@ -116,14 +116,14 @@ hardcore: LDFLAGS += -s
 hardcore: dirs
 
 ifdef JAVASCRIPT
-asan: CXXFLAGS += -fsanitize=undefined
-asan: LDFLAGS += -s STACK_OVERFLOW_CHECK=2 -s ASSERTIONS=2 -s NO_DISABLE_EXCEPTION_CATCHING=1 -s EXCEPTION_DEBUG=1 -fsanitize=undefined
+asan: CXXFLAGS += -fsanitize=address
+asan: LDFLAGS += -s STACK_OVERFLOW_CHECK=2 -s ASSERTIONS=2 -s NO_DISABLE_EXCEPTION_CATCHING=1 -s EXCEPTION_DEBUG=1 -fsanitize=address -s ALLOW_MEMORY_GROWTH=1
 else
 asan: CXXFLAGS += -rdynamic -fsanitize=address
 asan: LDFLAGS += -rdynamic -fsanitize=address
 endif
 asan: CXXFLAGS += -g3 -O0 -fno-omit-frame-pointer
-asan: LDFLAGS += -Wl,--export-dynamic 
+asan: LDFLAGS += -Wl,--export-dynamic -rdynamic
 ifndef JAVASCRIPT
 asan: LIBS+= -lbfd -ldw
 endif

@@ -6,18 +6,47 @@
   <meta name="author" content="amir@viel-zu.org">
   <meta name="viewport" content="width=768">
 <style>
-  #help {
+  #debugBtn {
     position: fixed;
     top: calc(100% - 4vh);
     left: 1em;
     margin: auto;
     color: rgba(0,0,0,0.8);
-    width: 5em;
-    max-height: 1.8em;
 /*     background: none!important; */
 /*     background-color: black; */
     font-size: 1em;
     padding: 0.1em;
+  }
+
+   #stderr {
+    position: absolute;
+    top: 19.5em;
+    display: block;
+    height: 9em;
+    width: 22em;
+    font-size: 1.2em;
+    background-color: black;
+    color: red;
+    overflow: scroll;
+    visibility: hidden;
+    border: 0.2em solid rgba(255,255,255,0.3);
+    border-radius: 0.5em;
+    margin: 0.5em;
+  }
+
+  #stdout {
+    position: absolute;
+    top: 7.5em;
+    display: block;
+    height: 9em;
+    width: 22em;
+    background-color: black;
+    color: white;
+    visibility: hidden;
+    border: 0.2em solid rgba(255,255,255,0.3);
+    font-size: 1.2em;
+    border-radius: 0.5em;
+    margin: 0.5em;
   }
 
 #palette {
@@ -76,28 +105,42 @@ body {
 </script>
 </head>
 <body style="background-color: #000000;">
-	<button id="help">Help</button>
+        <textarea cols=26 rows=5 id="stdout" style="visibility:hidden;"></textarea>
+        <textarea cols=26 rows=5 id="stderr" style="visibility:hidden;"></textarea>
+        <button id="debugBtn">Send debug report</button>
 <div id="content">
         <canvas id="canvas"></canvas>
-        <button id="help">Help</button>
-        <div id="palette"><input type="checkbox" id="chk"/><label for="chk">Copy Palette from image</label></div>
-        <div id="upload"><label for="file">Load Image: </label><input type="file" id="imageload" onchange="load_file()" accept="image/png, image/jpeg"/></div>
+        <!--<div id="palette"><input type="checkbox" id="chk"/><label for="chk">Copy Palette from image</label></div>
+        <div id="upload">
+        <label for="file">Load Image: </label><input type="file" id="imageload" onchange="load_file()" accept="image/png, image/jpeg"/>
+        </div>-->
 
         <script>
         var canvas = document.getElementById('canvas');
         var container = document.getElementById ("content");
+
+            var debugBtn = document.getElementById("debugBtn");
+            var out = document.getElementById("stdout");
+
+            debugBtn.onclick = function() {
+                var formattedBody = out.innerHTML;
+                var mailToLink = "mailto:sandcraft@viel-zu.org?subject=Report&body=" + encodeURIComponent(formattedBody);
+                window.location.href = mailToLink;
+            }
+
             var Module = {
 				print: (function() {
 					return function(message) {
+                        out.innerHTML += message + '\n';
                         console.log(message);
 					};
 				})(),
 				printErr: function(message) {
-				if(message === "loaded") {
-					canvas.style.width = container.clientWidth + "px";
-		                	canvas.style.height = container.clientHeight + "px";
-				}
-
+                    if(message === "loaded") {
+                        canvas.style.width = container.clientWidth + "px";
+                        canvas.style.height = container.clientHeight + "px";
+                    }
+                    out.innerHTML += '> ' + message + '\n';
                     console.error(message);
                 },				
 				canvas: (function() {
@@ -126,6 +169,7 @@ body {
                 FS.writeFile('temp.png', uint8_view)
                 Module.ccall('load_image', 'number', ['string', 'bool'], ['temp.png', checked])
             }
+
 		</script>
 		<script src="sandcraft.js"></script>
 </div>
