@@ -1,5 +1,5 @@
 # Sandcraft
-A 2 player (and soon more) falling sand game for the web. 
+A two player (and soon more) falling sand game for the web. 
 
 ## The Game
 The players are joined in a sandbox where they play and express whatever they want with diverse materials that act and interact.
