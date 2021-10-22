@@ -71,10 +71,7 @@ EM_BOOL web_socket_open(int eventType, const EmscriptenWebSocketOpenEvent *e,
 		void *userData) {
 	using namespace scserver;
 	printf("open(eventType=%d, userData=%ld)\n", eventType, (long) userData);
-	Message m(LIST, { });
-	std::stringstream ss;
-	m.write(ss);
-	emscripten_websocket_send_utf8_text(e->socket, ss.str().c_str());
+	emscripten_websocket_send_utf8_text(e->socket, Message(LIST, {}).str().c_str());
 //
 //	char data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 //	emscripten_websocket_send_binary(e->socket, data, sizeof(data));
@@ -135,16 +132,12 @@ EM_BOOL web_socket_message(int eventType,
 							[=](Description desc) {
 								GameState::getInstance().isHost_ = false;
 								Message m(JOIN, {base64_encode(desc.operator string()), string("name-") + utils::random_id(32), selRoom});
-								std::stringstream ss;
-								m.write(ss);
-								emscripten_websocket_send_utf8_text(e->socket, ss.str().c_str());
+								emscripten_websocket_send_utf8_text(e->socket, m.str().c_str());
 							},
 							[=](Candidate candidate) {
 								Message m(CLIENT, {base64_encode(candidate), base64_encode(candidate.mid())});
-								std::stringstream ss;
-								m.write(ss);
 								log_info("send client candidate", candidate);
-								emscripten_websocket_send_utf8_text(e->socket, ss.str().c_str());
+								emscripten_websocket_send_utf8_text(e->socket, m.str().c_str());
 							});
 					found = true;
 					break;
@@ -160,9 +153,7 @@ EM_BOOL web_socket_message(int eventType,
 							gs.isHost_ = true;
 							string sdp = base64_encode(desc);
 							Message m(CREATE, {sdp, string("room-") + utils::random_id(32), "1"});
-							std::stringstream ss;
-							m.write(ss);
-							emscripten_websocket_send_utf8_text(e->socket, ss.str().c_str());
+							emscripten_websocket_send_utf8_text(e->socket, m.str().c_str());
 						},
 						[&](Candidate candidate) {
 							log_info("add local candidate", candidate);
@@ -181,10 +172,8 @@ EM_BOOL web_socket_message(int eventType,
 				string cand = base64_encode(p.first);
 				string mid = base64_encode(p.second);
 				Message m(HOST, { cand, mid });
-				std::stringstream ss;
-				m.write(ss);
 				emscripten_websocket_send_utf8_text(e->socket,
-						ss.str().c_str());
+						m.str().c_str());
 				log_info("send host candidate", p.first);
 			}
 			auto tokens = split(str, ' ');
