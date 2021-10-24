@@ -109,7 +109,7 @@ public:
 	}
 
 	void triggerLineEvent(int newx, int newy, int oldx, int oldy) {
-		std::unique_lock<std::mutex>(levmtx_);
+		std::unique_lock<std::mutex> lock(levmtx_);
 		lineQ_.push({newx , newy, oldx, oldy});
 	}
 

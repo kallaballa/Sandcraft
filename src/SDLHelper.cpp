@@ -82,9 +82,10 @@ Uint32 SDLHelper::get_pixel(SDL_Surface *surface, int x, int y)
 
 #ifndef _AMIGA
 SDL_Surface* SDLHelper::loadPng(std::string path) {
+#ifndef __EMSCRIPTEN__
 	//The final optimized image
 	SDL_Surface* optimizedSurface = NULL;
-
+#endif
 	//Load image at specified path
 	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
 	if (loadedSurface == NULL) {

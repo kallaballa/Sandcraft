@@ -17,7 +17,6 @@ Buttons* Slots::BUTTONS = nullptr;
 
 void Slots::process_events() {
 	GameState& gs = GameState::getInstance();
-	Config& cfg = Config::getInstance();
 	AG_DriverEvent dev;
 	while (AG_GetNextEvent(DRV, &dev)) {
 		//Key strokes

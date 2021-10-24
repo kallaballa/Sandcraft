@@ -70,7 +70,7 @@ static std::string base64_decode(const std::string &in) {
 EM_BOOL web_socket_open(int eventType, const EmscriptenWebSocketOpenEvent *e,
 		void *userData) {
 	using namespace scserver;
-	printf("open(eventType=%d, userData=%ld)\n", eventType, (long) userData);
+	log_info("WS open");
 	emscripten_websocket_send_utf8_text(e->socket, Message(LIST, {}).str().c_str());
 	return 0;
 }
@@ -81,16 +81,14 @@ EM_BOOL web_socket_close(int eventType, const EmscriptenWebSocketCloseEvent *e,
 	if(Nexus::socket_ > 0)  {
 		Nexus::isClosed_ = true;
 
-	printf(
-			"close(eventType=%d, wasClean=%d, code=%d, reason=%s, userData=%ld)\n",
-			eventType, e->wasClean, e->code, e->reason, (long) userData);
+		log_info("WS closed", e->reason);
 	}
 	return 0;
 }
 
 EM_BOOL web_socket_error(int eventType, const EmscriptenWebSocketErrorEvent *e,
 		void *userData) {
-	printf("error(eventType=%d, userData=%ld)\n", eventType, (long) userData);
+	log_error("WS error", std::to_string((long) userData));
 	return 0;
 }
 
@@ -99,12 +97,9 @@ bool is_init = false;
 EM_BOOL web_socket_message(int eventType,
 		const EmscriptenWebSocketMessageEvent *e, void *userData) {
 	using namespace scserver;
-	printf(
-			"message(eventType=%d, userData=%ld, data=%p, numBytes=%d, isText=%d)\n",
-			eventType, (long) userData, e->data, e->numBytes, e->isText);
 
 	if (e->isText) {
-		printf("text data: \"%s\"\n", e->data);
+		log_debug("WS message", string((const char*)e->data));
 		std::string str((const char*) e->data);
 		if (startsWith(str, "Error:")) {
 			log_error("Received error", str);

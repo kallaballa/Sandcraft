@@ -9,14 +9,14 @@ namespace sandcraft {
 // at a given position withing the width)
 void Particles::emit(int x, int width, ParticleType type, float p) {
 	for (int i = x - width / 2; i < x + width / 2; i++) {
-		if (utils::rand() < (int) (RAND_MAX * p))
+		if (utils::rand() < (int) (float(RAND_MAX) * p))
 			vs_[i + config_.width_] = type;
 	}
 }
 
 //Performs logic of inert particles
 void Particles::inertParticleLogic(int x, int y, ParticleType type) {
-	int index, above, left, right, below, same, abovetwo;
+	int index, above, left, right, below, abovetwo;
 	switch (type) {
 
 		case NIL:
@@ -441,7 +441,7 @@ inline void Particles::moveParticle(int x, int y, ParticleType type) {
 		switch (type) {
 			case MOVEDWATER:
 				if (vs_[above] == SAND || vs_[above] == MUD
-						|| vs_[above] == SALTWATER && utils::rand() % 3 == 0) {
+						|| (vs_[above] == SALTWATER && utils::rand() % 3 == 0)) {
 					vs_[same] = vs_[above];
 					vs_[above] = type;
 					return;
@@ -456,7 +456,7 @@ inline void Particles::moveParticle(int x, int y, ParticleType type) {
 				break;
 			case MOVEDSALTWATER:
 				if (vs_[above] == DIRT || vs_[above] == MUD
-						|| vs_[above] == SAND && utils::rand() % 3 == 0) {
+						|| (vs_[above] == SAND && utils::rand() % 3 == 0)) {
 					vs_[same] = vs_[above];
 					vs_[above] = type;
 					return;
@@ -530,7 +530,7 @@ void Particles::drawParticles(int xpos, int ypos, int radius,
 // Drawing a line
 void Particles::drawLine(int newx, int newy, int oldx, int oldy) {
 	drawLineCallback_(newx, newy, oldx, oldy, currentParticleType_);
-//	if (GameState::getInstance().isHost)
+	if (GameState::getInstance().isHost_)
 		drawLine(newx, newy, oldx, oldy, currentParticleType_, GameState::getInstance().penSize_);
 }
 
@@ -616,7 +616,7 @@ void Particles::logic() {
 	}
 
 	{
-		std::unique_lock<std::mutex>(levmtx_);
+		std::unique_lock<std::mutex> lock(levmtx_);
 		while(!lineQ_.empty()) {
 			auto& lev = lineQ_.front();
 //			std::cout << "lev" << std::endl;

@@ -129,7 +129,7 @@ void init() {
 							| AG_WINDOW_MODAL);
 			AG_SetStyle(HELPWND, "font-size", "60%");
 			auto pane = AG_PaneNewHoriz(HELPWND, AG_PANE_VFILL | AG_PANE_HFILL);
-			auto tb1 =
+//			auto tb1 =
 					AG_LabelNew(pane->div[0], AG_LABEL_EXPAND,
 							"Sandcraft\n"
 									"---------\n"
@@ -144,7 +144,8 @@ void init() {
 									"---------\n"
 									"Select a brush type from the panel on the left part of\n"
 									"the screen and draw while pressing the left mouse button.\n");
-			auto tb2 = AG_LabelNew(pane->div[1], AG_LABEL_EXPAND, "Keymap\n"
+//			auto tb2 =
+					AG_LabelNew(pane->div[1], AG_LABEL_EXPAND, "Keymap\n"
 					"---------\n"
 					"ESC: Exit game\n"
 					"DELETE: Clear screen\n"
@@ -221,8 +222,6 @@ void step() {
 }
 
 void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
-	Config& cfg = Config::getInstance();
-	GameState& gs = GameState::getInstance();
 	try {
 		tick++;
 		t2 = AG_GetTicks();
