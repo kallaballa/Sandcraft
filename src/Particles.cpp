@@ -556,14 +556,14 @@ void Particles::doRandomLines(ParticleType type) {
 		int x1 = utils::rand() % config_.width_;
 		int x2 = utils::rand() % config_.width_;
 
-		drawLine(x1, 0, x2, config_.height_);
+		drawLine(x1, 0, x2, config_.height_, currentParticleType_, gs_.penSize_);
 	}
 
 	for (int i = 0; i < 20; i++) {
 		int y1 = utils::rand() % config_.height_;
 		int y2 = utils::rand() % config_.height_;
 
-		drawLine(0, y1, config_.width_, y2);
+		drawLine(0, y1, config_.width_, y2, currentParticleType_, gs_.penSize_);
 	}
 	currentParticleType_ = tmp;
 }
@@ -582,6 +582,7 @@ void Particles::updateVirtualPixel(int x, int y) {
 
 // Updating the particle system (virtual screen) pixel by pixel
 void Particles::updateVirtualScreen() {
+	auto l = lock();
 	for (int y = 0; y < config_.height_ - config_.dboard_height_; y++) {
 		// Due to biasing when iterating through the scanline from left to right,
 		// we now chose our direction randomly per scanline.
@@ -611,7 +612,7 @@ void Particles::logic() {
 	// to the polling procedure, then draw at the position (enabeling 'dynamic emitters')
 	if (gs.mouse_down_) {
 //		std::cout << "point" << std::endl;
-		drawLine(gs.oldx_, gs.oldy_, gs.oldx_, gs.oldy_);
+		drawLine(gs.oldx_, gs.oldy_, gs.oldx_, gs.oldy_, currentParticleType_, gs_.penSize_);
 	}
 
 	{

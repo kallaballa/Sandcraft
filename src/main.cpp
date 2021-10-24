@@ -53,6 +53,7 @@ std::thread* EVTHREAD = nullptr;
 AG_Driver* DRV = nullptr;
 Nexus* NEXUS = nullptr;
 std::mutex INIT_NEXUS_MTX;
+
 void initNexus() {
 	std::unique_lock<std::mutex> lock(INIT_NEXUS_MTX);
 	log_info("Init Nexus");
@@ -64,8 +65,9 @@ void initNexus() {
 	NEXUS = new Nexus("phokis.at", cfg.port_);
 	NEXUS->initRTC(
 			[&](std::vector<byte> data) {
-				if(NEXUS != nullptr && NEXUS->isOpen()) {
+		if(NEXUS != nullptr && NEXUS->isOpen()) {
 					if(!GameState::getInstance().isHost_) {
+//						NEXUS->receiveParticleRow(data, PARTICLES);
 						NEXUS->receiveParticles(data, PARTICLES);
 					} else {
 						NEXUS->receiveDrawLine(data, PARTICLES);
@@ -154,8 +156,7 @@ void init() {
 					"RETURN: turn on/off emitters\n"
 					"PLUS/MINUS: decrease/increase emitters density\n"
 					"TAB: hide/show the toolbar.");
-			AG_ButtonNewFn(HELPWND, AG_BUTTON_HFILL, "Close", AGWINHIDE(HELPWND)
-					);
+			AG_ButtonNewFn(HELPWND, AG_BUTTON_HFILL, "Close", AGWINHIDE(HELPWND));
 			AG_WindowSetPosition(HELPWND, AG_WINDOW_TC, 1);
 			AG_WindowShow(HELPWND);
 		} else {
@@ -175,7 +176,7 @@ void init() {
 		log_error("Exception", ex.what());
 	}
 	GameState::getInstance().done_ = 0;
-	std::cerr << "loaded" << std::endl;
+	std::cout << "loaded" << std::endl;
 }
 
 #ifdef __EMSCRIPTEN__
@@ -225,7 +226,7 @@ void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
 	try {
 		tick++;
 		t2 = AG_GetTicks();
-		if (t2 - t1 >= 1000 / 60) {
+		if (t2 - t1 >= 1000 / 30) {
 			if (NEXUS != nullptr && NEXUS->isClosed()) {
 				(*COLORS)[NOTHING] = 0xFF0000FF;
 				initNexus();
@@ -236,10 +237,13 @@ void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
 			}
 
 			if (NEXUS != nullptr && GameState::getInstance().isHost_ && NEXUS->isOpen()) {
-				NEXUS->sendParticles(*PARTICLES);
-//				for (uint16_t y = 0; y < cfg.height_; ++y) {
-//					NEXUS->sendParticleRow(y, *PARTICLES);
+				if(NEXUS->rtc_->dc_->bufferedAmount() == 0) {
+					NEXUS->sendParticles(*PARTICLES);
+
+//				for(size_t y = 0; y < cfg.height_; ++y) {
+//					NEXUS->sendParticleRow(y,*PARTICLES);
 //				}
+				}
 			}
 
 			if (SDL_MUSTLOCK(SDL->screen_)) {
@@ -250,10 +254,10 @@ void single_player_step(long& tick, Uint32& t1, Uint32& t2) {
 
 			SCENE->draw();
 
-			if (DASHWND != nullptr && DASHWND->visible) {
+			if (DASHWND != nullptr && AG_WindowIsVisible(DASHWND)) {
 				AG_WindowDraw(DASHWND);
 			}
-			if (HELPWND != nullptr && HELPWND->visible) {
+			if (HELPWND != nullptr && AG_WindowIsVisible(HELPWND)) {
 				AG_WindowDraw(HELPWND);
 			}
 
@@ -279,7 +283,7 @@ int main(int argc, char **argv) {
 #ifndef __EMSCRIPTEN__
 	XInitThreads();
 #endif
-	Logger::init(L_DEBUG);
+	Logger::init(L_GLOBAL);
 	ErrorHandler::init([](const string& msg){
 		log_error("Error", msg);
 	});
@@ -349,13 +353,24 @@ int load_image(char* file_path, bool copyPalette) {
 	using namespace sandcraft;
 	Config& cfg = Config::getInstance();
 	SDL_Surface* img = SDL->loadPng(file_path);
-	assert(img->w <= cfg.width_ && img->h <= cfg.height_);
-	assert(img->w > 0 && img->h > 0);
+	if(img->w == 0 && img->h == 0) {
+		log_warn("Empty image loaded");
+		return 1;
+	}
+
+	off_t w = img->w;
+	off_t h = img->h;
 	off_t offx = (cfg.width_ - img->w) / 2;
 	off_t offy = (cfg.height_ - img->h) / 2;
 
-	for (size_t x = 0; x < img->w; ++x) {
-		for (size_t y = 0; y < img->h; ++y) {
+	if(img->w > cfg.width_ || img->h > cfg.height_) {
+		w = cfg.width_;
+		h = cfg.height_;
+		offx = 0;
+		offy = 0;
+	}
+	for (size_t x = 0; x < w; ++x) {
+		for (size_t y = 0; y < h; ++y) {
 			Uint32 p = SDL->get_pixel(img, x, y);
 			(*PARTICLES)[offx + x + ((offy + y) * cfg.width_)] = ParticleType(
 					((p % PARTICLETYPE_ENUM_LENGTH))
@@ -363,8 +378,8 @@ int load_image(char* file_path, bool copyPalette) {
 		}
 	}
 	if (copyPalette) {
-		for (size_t x = 0; x < img->w; ++x) {
-			for (size_t y = 0; y < img->h; ++y) {
+		for (size_t x = 0; x < w; ++x) {
+			for (size_t y = 0; y < h; ++y) {
 				Uint32 p = SDL->get_pixel(img, x, y);
 				int index = p % PARTICLETYPE_ENUM_LENGTH;
 				Uint8 r, g, b;

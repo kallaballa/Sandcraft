@@ -8,12 +8,8 @@
 <style>
   #debugBtn {
     position: fixed;
-    top: calc(100% - 4vh);
     left: 1em;
-    margin: auto;
-    color: rgba(0,0,0,0.8);
-/*     background: none!important; */
-/*     background-color: black; */
+    width: 11em;
     font-size: 1em;
     padding: 0.1em;
   }
@@ -52,13 +48,11 @@
 #palette {
     position: fixed;
     top: calc(100% - 4vh);
-    left: 7em;
+    left: 32em;
     margin: auto;
     color: rgba(255,255,255,0.8);
-    width: 13em;
+    width: 20em;
     max-height: 1.8em;
-/*     background: none!important; */
-/*     background-color: black; */
     font-size: 1em;
     padding: 0.1em;
   }
@@ -66,13 +60,11 @@
 #upload {
     position: fixed;
     top: calc(100% - 4vh);
-    left: 20em;
+    left: 15em;
+    width: 25em;
     margin: auto;
     color: rgba(255,255,255,0.8);
-/*     width: 5em; */
     max-height: 1.8em;
-/*     background: none!important; */
-/*     background-color: black; */
     font-size: 1em;
     padding: 0.1em;
   }
@@ -88,9 +80,7 @@ body {
 #canvas {
     position: absolute;
     top: 0;
-    bottom: 0;
     left: 0;
-    right: 0;
 }
 
 </style>
@@ -107,14 +97,15 @@ body {
 <body style="background-color: #000000;">
         <textarea cols=26 rows=5 id="stdout" style="visibility:hidden;"></textarea>
         <textarea cols=26 rows=5 id="stderr" style="visibility:hidden;"></textarea>
-        <button id="debugBtn">Send debug report</button>
 <div id="content">
         <canvas id="canvas"></canvas>
-        <!--<div id="palette"><input type="checkbox" id="chk"/><label for="chk">Copy Palette from image</label></div>
+        <div id="palette">
+        <button id="debugBtn">Send debug report</button>
+        <input type="checkbox" id="chk"/><label for="chk">Copy Palette from image</label>
+        </div>
         <div id="upload">
         <label for="file">Load Image: </label><input type="file" id="imageload" onchange="load_file()" accept="image/png, image/jpeg"/>
-        </div>-->
-
+        </div>
         <script>
         var canvas = document.getElementById('canvas');
         var container = document.getElementById ("content");
@@ -131,15 +122,15 @@ body {
             var Module = {
 				print: (function() {
 					return function(message) {
+                        if(message === "loaded") {
+                            canvas.style.width = container.clientWidth + "px";
+                            canvas.style.height = container.clientHeight + "px";
+                        }
                         out.innerHTML += message + '\n';
                         console.log(message);
 					};
 				})(),
 				printErr: function(message) {
-                    if(message === "loaded") {
-                        canvas.style.width = container.clientWidth + "px";
-                        canvas.style.height = container.clientHeight + "px";
-                    }
                     out.innerHTML += '> ' + message + '\n';
                     console.error(message);
                 },				
@@ -172,6 +163,7 @@ body {
 
 		</script>
 		<script src="sandcraft.js"></script>
+
 </div>
 </body>
 </html>

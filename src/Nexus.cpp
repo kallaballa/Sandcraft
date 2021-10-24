@@ -72,11 +72,6 @@ EM_BOOL web_socket_open(int eventType, const EmscriptenWebSocketOpenEvent *e,
 	using namespace scserver;
 	printf("open(eventType=%d, userData=%ld)\n", eventType, (long) userData);
 	emscripten_websocket_send_utf8_text(e->socket, Message(LIST, {}).str().c_str());
-//
-//	char data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-//	emscripten_websocket_send_binary(e->socket, data, sizeof(data));
-//
-//	emscripten_websocket_close(e->socket, 0, 0);
 	return 0;
 }
 
@@ -260,6 +255,7 @@ void Nexus::initRTC(std::function<void(std::vector<byte>)> recvCallback) {
 }
 
 void Nexus::sendParticles(Particles& particles) {
+	auto l = particles.lock();
 	Config& cfg = Config::getInstance();
 	long inlen = cfg.width_ * cfg.height_ * sizeof(ParticleType);
 	const char *inrow = (const char*) particles.vs_;
@@ -282,11 +278,11 @@ void Nexus::sendParticles(Particles& particles) {
     deflateInit(&defstream, Z_BEST_SPEED);
     deflate(&defstream, Z_FINISH);
     deflateEnd(&defstream);
-
 	rtc_->dc_->send((byte*) compmsg, defstream.total_out);
 }
 
 void Nexus::sendParticleRow(uint16_t y, Particles& particles) {
+	auto l = particles.lock();
 	Config& cfg = Config::getInstance();
 	long inlen = cfg.width_ * sizeof(ParticleType);
 	const char *inrow = (const char*) (particles.vs_ + (y * cfg.width_));
@@ -314,13 +310,13 @@ void Nexus::sendParticleRow(uint16_t y, Particles& particles) {
 }
 
 void Nexus::receiveParticles(const std::vector<byte>& data, Particles* particles) {
+	auto l = particles->lock();
 	Config& cfg = Config::getInstance();
 	const char* msgdata = (const char*)data.data();
 	long decompLen = sizeof(ParticleType) * cfg.width_ * cfg.height_ + 2;
 	static char* decomp = new char[decompLen];
 
 	z_stream infstream;
-	z_stream defstream;
 	infstream.zalloc = Z_NULL;
 	infstream.zfree = Z_NULL;
 	infstream.opaque = Z_NULL;
@@ -339,13 +335,13 @@ void Nexus::receiveParticles(const std::vector<byte>& data, Particles* particles
 }
 
 void Nexus::receiveParticleRow(const std::vector<byte>& data, Particles* particles) {
+	auto l = particles->lock();
 	Config& cfg = Config::getInstance();
 	const char* msgdata = (const char*)data.data();
 	long decompLen = sizeof(ParticleType) * cfg.width_ + 2;
 	static char* decomp = new char[decompLen];
 
 	z_stream infstream;
-	z_stream defstream;
 	infstream.zalloc = Z_NULL;
 	infstream.zfree = Z_NULL;
 	infstream.opaque = Z_NULL;

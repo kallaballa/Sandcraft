@@ -1486,9 +1486,12 @@ SDL_bool SDL_IntersectRect(const SDL_Rect *A, const SDL_Rect *B, SDL_Rect *inter
 	return (intersection->w && intersection->h) ? SDL_TRUE : SDL_FALSE;
 }
 
+#ifdef __EMSCRIPTEN__
 static int SANDCRAFT_SDL_FillRect1(SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color);
 static int SANDCRAFT_SDL_FillRect4(SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color);
 int SANDCRAFT_SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color);
+#define SDL_FillRect SANDCRAFT_SDL_FillRect
+#endif
 
 static void
 SDLFB_FillRect(void *_Nonnull obj, const AG_Rect *r, const AG_Color *_Nonnull c)
@@ -1501,7 +1504,7 @@ SDLFB_FillRect(void *_Nonnull obj, const AG_Rect *r, const AG_Color *_Nonnull c)
 	rSDL.w = r->w;
 	rSDL.h = r->h;
 
-	SANDCRAFT_SDL_FillRect(sfb->s, &rSDL,
+	SDL_FillRect(sfb->s, &rSDL,
 	    SDL_MapRGB(sfb->s->format,
 	        AG_Hto8(c->r),
 		AG_Hto8(c->g),
@@ -1532,7 +1535,7 @@ static void SDLFB_DrawRectFilled(void *_Nonnull obj, const AG_Rect *r,
 //        }
 //    }
 
-	SANDCRAFT_SDL_FillRect(S, &rd,
+	SDL_FillRect(S, &rd,
 	    SDL_MapRGB(S->format,
 	        AG_Hto8(c->r),
 	        AG_Hto8(c->g),
@@ -1719,7 +1722,7 @@ SDLFB_OpenVideo(void *_Nonnull obj, Uint w, Uint h, int depth, Uint flags)
 	AG_InitStockCursors(drv);
 
 	/* Set background color. */
-	SANDCRAFT_SDL_FillRect(S, NULL, SDL_MapRGB(S->format,
+	SDL_FillRect(S, NULL, SDL_MapRGB(S->format,
 	    AG_Hto8(dsw->bgColor.r),
 	    AG_Hto8(dsw->bgColor.g),
 	    AG_Hto8(dsw->bgColor.b)));
@@ -1853,7 +1856,7 @@ SDLFB_VideoResize(void *_Nonnull obj, Uint w, Uint h)
 
 	/* Clear the background. */
 	if (!(dsw->flags & AG_DRIVER_SW_OVERLAY)) {
-		SANDCRAFT_SDL_FillRect(S, NULL,
+		SDL_FillRect(S, NULL,
 		    SDL_MapRGB(S->format,
 		        AG_Hto8(dsw->bgColor.r),
 			AG_Hto8(dsw->bgColor.g),
@@ -1877,7 +1880,7 @@ SDLFB_VideoClear(void *_Nonnull obj, const AG_Color *c)
 	AG_DriverSDLFB *sfb = obj;
 	SDL_Surface *S = sfb->s;
 
-	SANDCRAFT_SDL_FillRect(S, NULL,
+	SDL_FillRect(S, NULL,
 	    SDL_MapRGB(S->format,
 	        AG_Hto8(c->r),
 		AG_Hto8(c->g),

@@ -93,6 +93,7 @@ private:
 	Config& config_ = Config::getInstance();
 	std::queue<LineEvent> lineQ_;
 	std::mutex levmtx_;
+	std::mutex vsmtx_;
 public:
 	ParticleType *vs_;
 	ParticleType currentParticleType_ = WALL;
@@ -100,6 +101,11 @@ public:
 	Particles(std::function<void(int, int, int, int, ParticleType)> drawLineCallback) {
 		vs_ = new ParticleType[config_.width_ * config_.height_];
 		drawLineCallback_ = drawLineCallback;
+		clear();
+	}
+
+	std::unique_lock<std::mutex> lock() {
+		return std::unique_lock<std::mutex>(vsmtx_);
 	}
 
 	void triggerLineEvent(int newx, int newy, int oldx, int oldy) {
